@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">DYNAMIC WORKFLOW</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+
+    <string name="sign_in">Sign In</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="forgot_password"><u>Forgot Password?</u></string>
+    <string name="cancel">CANCEL</string>
+    <string name="ok">OK</string>
+    <string name="forgot_password_edt">Input your email here.</string>
+    <string name="send">SEND</string>
+
+    <string name="logout_confirm">Are you sure you want to log out?</string>
+
+    <string name="search_workflow">Search Workflow</string>
+
+    <string name="request_title">Xin nghỉ học</string>
+
+    <string name="name">Name:</string>
+    <string name="owner">Owner:</string>
+    <string name="description">Description:</string>
+
+    <!-- Toast Error -->
+    <string name="data_null">You have not selected the file!</string>
+
+    <!-- Toast Success -->
+    <string name="request_sent">Your request has been sent!</string>
+
+    <!-- Grant Permission -->
+    <string name="permission_needed">Permission needed</string>
+    <string name="permission_required_message">This permission is required to continue using the application.</string>
+    <string name="permission_not_granted">You must granted permission!</string>
+    <string name="permission_granted">Permission is granted.</string>
+
+    <!-- Message Forgot password-->
+    <string name="send_code_success">Please check your email to get code!</string>
+    <string name="send_code_fail">There are no accounts using this email!</string>
+</resources>
