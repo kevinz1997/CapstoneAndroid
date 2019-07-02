@@ -1,19 +1,30 @@
 package workflow.capstone.capstoneproject.activity;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
+import es.dmoral.toasty.Toasty;
 import workflow.capstone.capstoneproject.R;
 import workflow.capstone.capstoneproject.adapter.TabAdapter;
+import workflow.capstone.capstoneproject.fragment.NotificationFragment;
+import workflow.capstone.capstoneproject.fragment.ProfileFragment;
+import workflow.capstone.capstoneproject.fragment.RequestHistoryFragment;
 import workflow.capstone.capstoneproject.fragment.WorkflowFragment;
 import workflow.capstone.capstoneproject.repository.CapstoneRepository;
 import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
@@ -28,9 +39,15 @@ public class MainActivity extends AppCompatActivity {
     private CapstoneRepository capstoneRepository;
 
     private TabLayout tabLayout;
-    private ViewPager viewPager;
     private TextView badge;
     private ImageView imageView;
+    private FragmentManager fragmentManager;
+    private FragmentTransaction fragmentTransaction;
+
+    private WorkflowFragment workflowFragment;
+    private RequestHistoryFragment requestHistoryFragment;
+    private NotificationFragment notificationFragment;
+    private ProfileFragment profileFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,18 +64,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTabLayout() {
-        viewPager = findViewById(R.id.view_Pager);
         tabLayout = findViewById(R.id.tab_Layout);
-        setupViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
+        workflowFragment = new WorkflowFragment();
+        requestHistoryFragment = new RequestHistoryFragment();
+        notificationFragment = new NotificationFragment();
+        profileFragment = new ProfileFragment();
+        for (int i = 0; i < 4; i++) {
+            tabLayout.addTab(tabLayout.newTab());
+        }
+
         setupTabIcons();
         setOnChangeTab();
-    }
-
-    private void setupViewPager(ViewPager viewPager) {
-        TabAdapter adapter = new TabAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(adapter);
-        viewPager.setOffscreenPageLimit(4);
+        setCurrentTabFragment(0);
     }
 
     private void setupTabIcons() {
@@ -108,24 +125,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                int tabIndex = tab.getPosition();
-                switch (tab.getPosition()) {
-                    case 0:
-                        tabLayout.getTabAt(tabIndex).setIcon(tabIcons[1]);
-                        break;
-                    case 1:
-                        tabLayout.getTabAt(tabIndex).setIcon(tabIcons[1]);
-                        break;
-                    case 2:
-                        imageView.setImageResource(R.drawable.ic_notification_blue);
-                        badge.setVisibility(View.INVISIBLE);
-                        break;
-                    case 3:
-                        tabLayout.getTabAt(tabIndex).setIcon(tabIcons[5]);
-                        break;
-                    default:
-                        break;
-                }
+                setCurrentTabFragment(tab.getPosition());
             }
 
             @Override
@@ -134,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
                 switch (tab.getPosition()) {
                     case 0:
                         tabLayout.getTabAt(tabIndex).setIcon(tabIcons[0]);
-                        FragmentUtils.changeFragment(MainActivity.this, R.id.page_one_fragment, new WorkflowFragment());
                         break;
                     case 1:
                         tabLayout.getTabAt(tabIndex).setIcon(tabIcons[0]);
@@ -155,5 +154,37 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void setCurrentTabFragment(int tabPosition)
+    {
+        switch (tabPosition) {
+            case 0:
+                tabLayout.getTabAt(tabPosition).setIcon(tabIcons[1]);
+                replaceFragment(workflowFragment);
+                break;
+            case 1:
+                tabLayout.getTabAt(tabPosition).setIcon(tabIcons[1]);
+                replaceFragment(requestHistoryFragment);
+                break;
+            case 2:
+                imageView.setImageResource(R.drawable.ic_notification_blue);
+                badge.setVisibility(View.INVISIBLE);
+                replaceFragment(notificationFragment);
+                break;
+            case 3:
+                tabLayout.getTabAt(tabPosition).setIcon(tabIcons[5]);
+                replaceFragment(profileFragment);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        fragmentManager = MainActivity.this.getSupportFragmentManager();
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.main_frame, fragment);
+        fragmentTransaction.commit();
     }
 }

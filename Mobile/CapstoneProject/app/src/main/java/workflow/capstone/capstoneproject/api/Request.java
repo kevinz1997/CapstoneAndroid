@@ -1,19 +1,31 @@
 package workflow.capstone.capstoneproject.api;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class Request {
-
+    @SerializedName("description")
+    @Expose
     private String description;
-
+    @SerializedName("workFlowTemplateID")
+    @Expose
     private String workFlowTemplateID;
-
+    @SerializedName("nextStepID")
+    @Expose
     private String nextStepID;
-
+    @SerializedName("status")
+    @Expose
     private Integer status;
-
+    @SerializedName("myProperty")
+    @Expose
+    private Integer myProperty;
+    @SerializedName("actionValues")
+    @Expose
     private List<ActionValue> actionValues = null;
-
+    @SerializedName("imagePaths")
+    @Expose
     private List<String> imagePaths = null;
 
     public String getDescription() {
@@ -46,6 +58,14 @@ public class Request {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getMyProperty() {
+        return myProperty;
+    }
+
+    public void setMyProperty(Integer myProperty) {
+        this.myProperty = myProperty;
     }
 
     public List<ActionValue> getActionValues() {

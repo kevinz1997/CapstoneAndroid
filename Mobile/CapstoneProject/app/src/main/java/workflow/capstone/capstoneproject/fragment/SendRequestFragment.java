@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -21,8 +20,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +36,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import workflow.capstone.capstoneproject.R;
-import workflow.capstone.capstoneproject.adapter.ListUploadImageAdapter;
+import workflow.capstone.capstoneproject.adapter.ListFileNameAdapter;
 import workflow.capstone.capstoneproject.api.ActionValue;
 import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.repository.CapstoneRepository;
@@ -49,7 +48,7 @@ import workflow.capstone.capstoneproject.utils.FragmentUtils;
 import workflow.capstone.capstoneproject.utils.GetRealPathFromURI;
 import workflow.capstone.capstoneproject.utils.KProgressHUDManager;
 
-public class DetailWorkflowFragment extends Fragment {
+public class SendRequestFragment extends Fragment {
 
     private ImageView imgBack;
     private ImageView imgUploadFile;
@@ -57,24 +56,24 @@ public class DetailWorkflowFragment extends Fragment {
     private EditText edtReason;
     private Button btnSend;
     private TextView tvNameOfWorkFlow;
-    private TextView tvUploadSuccess;
-    private GridView gridViewImage;
+    private ListView listView;
     private CapstoneRepository capstoneRepository;
     private String token = null;
-    private List<String> listImageAbsolutePath = new ArrayList<>();
-    private ListUploadImageAdapter listUploadImageAdapter;
+    private List<String> listName = new ArrayList<>();
+    private ListFileNameAdapter listFileNameAdapter;
     private List<String> listPath = new ArrayList<>();
     private List<Uri> uriList = new ArrayList<>();
     private MultipartBody.Part[] fileParts;
+    private int checkToGo = 0;
 
-    public DetailWorkflowFragment() {
+    public SendRequestFragment() {
         // Required empty public constructor
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_detail_workflow, container, false);
+        final View view = inflater.inflate(R.layout.fragment_send_request, container, false);
         initView(view);
         final Bundle bundle = getArguments();
 
@@ -90,19 +89,16 @@ public class DetailWorkflowFragment extends Fragment {
         imgUploadFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("*/*");
-                startActivityForResult(intent, ConstantDataManager.PICK_FILE_REQUEST);
+                checkToGo = 2;
+                readStoragePermissionGranted();
             }
         });
 
         imgUploadImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                startActivityForResult(intent, ConstantDataManager.PICK_IMAGE_REQUEST);
+                checkToGo = 1;
+                readStoragePermissionGranted();
             }
         });
 
@@ -110,7 +106,6 @@ public class DetailWorkflowFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 sendRequest(bundle.getString("workFlowTemplateID"));
-//                Toast.makeText(getContext(), "workFlowTemplateID: " + bundle.getString("workFlowTemplateID"), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -126,7 +121,7 @@ public class DetailWorkflowFragment extends Fragment {
             switch (requestCode) {
                 case ConstantDataManager.PICK_FILE_REQUEST:
                     if (data == null) {
-                        Toasty.error(getContext(), R.string.data_null, Toasty.LENGTH_SHORT);
+                        Toasty.warning(getContext(), R.string.data_null, Toasty.LENGTH_SHORT).show();
                         return;
                     }
 
@@ -134,6 +129,11 @@ public class DetailWorkflowFragment extends Fragment {
                     String realPath = GetRealPathFromURI.getPath(getActivity(), selectedFileUri);
                     if (realPath != null && !realPath.isEmpty()) {
                         final File file = new File(realPath);
+
+                        if (!listName.contains(file.getName())) {
+                            listName.add(file.getName());
+                        }
+
                         RequestBody requestFile = RequestBody.create(MediaType.parse(getActivity().getContentResolver().getType(selectedFileUri)), file);
                         MultipartBody.Part multipartBody = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
@@ -145,6 +145,7 @@ public class DetailWorkflowFragment extends Fragment {
                                 for (int i = 0; i < strings.length; i++) {
                                     listPath.add(strings[i]);
                                 }
+                                configListView();
                             }
 
                             @Override
@@ -174,8 +175,7 @@ public class DetailWorkflowFragment extends Fragment {
         tvNameOfWorkFlow = view.findViewById(R.id.tv_name_of_workflow);
         imgUploadFile = view.findViewById(R.id.img_upload_file);
         imgUploadImage = view.findViewById(R.id.img_upload_image);
-        tvUploadSuccess = view.findViewById(R.id.tv_upload_success);
-        gridViewImage = view.findViewById(R.id.grid_view_image);
+        listView = view.findViewById(R.id.list_file_name);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -191,8 +191,8 @@ public class DetailWorkflowFragment extends Fragment {
         for (int i = 0; i < uriList.size(); i++) {
             Uri selectedFileUriImage = uriList.get(i);
             File file = new File(GetRealPathFromURI.getPath(getActivity(), selectedFileUriImage));
-            if (!listImageAbsolutePath.contains(file.getAbsolutePath())) {
-                listImageAbsolutePath.add(file.getAbsolutePath());
+            if (!listName.contains(file.getName())) {
+                listName.add(file.getName());
             }
             // Khởi tạo RequestBody từ những file đã được chọn
             RequestBody requestBody = RequestBody.create(MediaType.parse(getActivity().getContentResolver().getType(selectedFileUriImage)), file);
@@ -208,20 +208,20 @@ public class DetailWorkflowFragment extends Fragment {
                 for (int i = 0; i < strings.length; i++) {
                     listPath.add(strings[i]);
                 }
-                configGridView();
+                configListView();
             }
 
             @Override
             public void onFail(String message) {
-                Toasty.error(getContext(), message, Toasty.LENGTH_SHORT);
+                Toasty.error(getContext(), message, Toasty.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void configGridView() {
-        listUploadImageAdapter = new ListUploadImageAdapter(getContext(), listImageAbsolutePath);
-        gridViewImage.setAdapter(listUploadImageAdapter);
-        gridViewImage.setVisibility(View.VISIBLE);
+    private void configListView() {
+        listFileNameAdapter = new ListFileNameAdapter(getContext(), listName);
+        listView.setAdapter(listFileNameAdapter);
+        listView.setVisibility(View.VISIBLE);
     }
 
     private void sendRequest(String workFlowTemplateID) {
@@ -236,7 +236,7 @@ public class DetailWorkflowFragment extends Fragment {
             Request request = new Request();
             request.setDescription("Xin nghi hoc");
             request.setWorkFlowTemplateID(workFlowTemplateID);
-            request.setNextStepID("5cdf2701-6af0-4a6b-8d79-08d6f8a56d9f");
+            request.setNextStepID("2bf006ca-5491-46f3-7c54-08d6fa1150f8");
             request.setStatus(1);
             request.setActionValues(actionValues);
             request.setImagePaths(listPath);
@@ -253,7 +253,8 @@ public class DetailWorkflowFragment extends Fragment {
 
                 @Override
                 public void onFail(String message) {
-//                    Toasty.error(getContext(), message);
+                    khub.dismiss();
+                    Toasty.error(getContext(), message, Toasty.LENGTH_SHORT).show();
                 }
             });
         }
@@ -263,6 +264,16 @@ public class DetailWorkflowFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= 23) {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
+                if (checkToGo == 1) {
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    startActivityForResult(intent, ConstantDataManager.PICK_IMAGE_REQUEST);
+                } else if (checkToGo == 2) {
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("*/*");
+                    startActivityForResult(intent, ConstantDataManager.PICK_FILE_REQUEST);
+                }
             } else {
                 requestStoragePermission();
             }
@@ -270,14 +281,14 @@ public class DetailWorkflowFragment extends Fragment {
     }
 
     private void requestStoragePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             new AlertDialog.Builder(getContext())
                     .setTitle(R.string.permission_needed)
                     .setMessage(R.string.permission_required_message)
                     .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, ConstantDataManager.MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
+                            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, ConstantDataManager.MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -287,7 +298,7 @@ public class DetailWorkflowFragment extends Fragment {
                         }
                     }).create().show();
         } else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, ConstantDataManager.MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, ConstantDataManager.MY_PERMISSIONS_READ_EXTERNAL_STORAGE);
         }
     }
 
@@ -296,9 +307,9 @@ public class DetailWorkflowFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == ConstantDataManager.MY_PERMISSIONS_READ_EXTERNAL_STORAGE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toasty.success(getContext(), R.string.permission_granted, Toasty.LENGTH_SHORT);
+                Toasty.success(getContext(), R.string.permission_granted, Toasty.LENGTH_SHORT).show();
             } else {
-                Toasty.warning(getContext(), R.string.permission_not_granted, Toasty.LENGTH_SHORT);
+                Toasty.warning(getContext(), R.string.permission_not_granted, Toasty.LENGTH_SHORT).show();
             }
         }
     }

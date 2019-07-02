@@ -5,21 +5,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
 
 import workflow.capstone.capstoneproject.R;
-import workflow.capstone.capstoneproject.entities.Notification;
+import workflow.capstone.capstoneproject.entities.UserNotification;
 
 
 public class NotificationAdapter extends BaseAdapter {
 
-    private List<Notification> listData;
+    private List<UserNotification> listData;
     private LayoutInflater layoutInflater;
     private Context mContext;
 
-    public NotificationAdapter(List<Notification> listData, Context mContext) {
+    public NotificationAdapter(List<UserNotification> listData, Context mContext) {
         this.listData = listData;
         this.mContext = mContext;
         layoutInflater = LayoutInflater.from(mContext);
@@ -46,20 +47,31 @@ public class NotificationAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.notification_listview, null);
             holder = new ViewHolder();
-            holder.tvApprover = convertView.findViewById(R.id.tv_Approver);
-            holder.tvMessage = convertView.findViewById(R.id.tv_Message);
+            holder.tvMessage = convertView.findViewById(R.id.tv_message);
+            holder.imgIsHandled = convertView.findViewById(R.id.img_is_handled);
+            holder.lineView = convertView.findViewById(R.id.line_view);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        Notification notification = this.listData.get(position);
-        holder.tvApprover.setText(notification.getApproverName());
-        holder.tvMessage.setText(notification.getMessage());
+        UserNotification userNotification = this.listData.get(position);
+        holder.tvMessage.setText(userNotification.getMessage() + " from " + userNotification.getActorName());
+        if (userNotification.getIsHandled()) {
+            holder.imgIsHandled.setVisibility(View.VISIBLE);
+        } else {
+            holder.imgIsHandled.setVisibility(View.GONE);
+        }
+        if (position == getCount() - 1) {
+            holder.lineView.setVisibility(View.GONE);
+        } else {
+            holder.lineView.setVisibility(View.VISIBLE);
+        }
         return convertView;
     }
 
     private class ViewHolder {
-        TextView tvApprover;
         TextView tvMessage;
+        ImageView imgIsHandled;
+        View lineView;
     }
 }

@@ -5,22 +5,25 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Notification implements Serializable {
+public class UserNotification implements Serializable {
     @SerializedName("eventID")
     @Expose
     private String eventID;
     @SerializedName("message")
     @Expose
     private String message;
-    @SerializedName("fullname")
+    @SerializedName("actorName")
     @Expose
-    private String fullname;
+    private String actorName;
     @SerializedName("notificationType")
     @Expose
     private Integer notificationType;
-    @SerializedName("approverName")
+    @SerializedName("notificationTypeName")
     @Expose
-    private String approverName;
+    private String notificationTypeName;
+    @SerializedName("isHandled")
+    @Expose
+    private Boolean isHandled;
 
     public String getEventID() {
         return eventID;
@@ -38,12 +41,12 @@ public class Notification implements Serializable {
         this.message = message;
     }
 
-    public String getFullname() {
-        return fullname;
+    public String getActorName() {
+        return actorName;
     }
 
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
+    public void setActorName(String actorName) {
+        this.actorName = actorName;
     }
 
     public Integer getNotificationType() {
@@ -54,11 +57,19 @@ public class Notification implements Serializable {
         this.notificationType = notificationType;
     }
 
-    public String getApproverName() {
-        return approverName;
+    public String getNotificationTypeName() {
+        return notificationTypeName;
     }
 
-    public void setApproverName(String approverName) {
-        this.approverName = approverName;
+    public void setNotificationTypeName(String notificationTypeName) {
+        this.notificationTypeName = notificationTypeName;
+    }
+
+    public Boolean getIsHandled() {
+        return isHandled;
+    }
+
+    public void setIsHandled(Boolean isHandled) {
+        this.isHandled = isHandled;
     }
 }
