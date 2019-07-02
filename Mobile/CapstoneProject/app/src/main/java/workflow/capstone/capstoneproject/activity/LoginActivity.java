@@ -2,26 +2,26 @@ package workflow.capstone.capstoneproject.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.drawable.ColorDrawable;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import es.dmoral.toasty.Toasty;
 import workflow.capstone.capstoneproject.R;
-import workflow.capstone.capstoneproject.customdialog.SendEmailDialog;
+import workflow.capstone.capstoneproject.customdialog.VerifyAccountDialog;
 import workflow.capstone.capstoneproject.entities.Login;
+import workflow.capstone.capstoneproject.entities.Profile;
 import workflow.capstone.capstoneproject.repository.CapstoneRepository;
 import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
 import workflow.capstone.capstoneproject.utils.CallBackData;
@@ -54,7 +54,9 @@ public class LoginActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onClick(View v) {
-                forgotPassword();
+                Intent intent = new Intent(LoginActivity.this, SendCodeActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
     }
@@ -68,15 +70,22 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login() {
-        String username = inputEmail.getText().toString();
+        final String username = inputEmail.getText().toString();
         String password = inputPassword.getText().toString();
+
+        SharedPreferences preferences = context.getSharedPreferences("VERIFYACCOUNT", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("username", username);
+        editor.putString("password", password);
+        editor.commit();
+
         Map<String, String> fields = new LinkedHashMap<>();
         fields.put("userName", username);
         fields.put("password", password);
 
         boolean checkConnection = DynamicWorkflowUtils.isConnectingToInternet(context);
         if (!checkConnection) {
-            setTextError("Please connect to the Internet to continue!");
+            setTextError(R.string.no_network + "");
         } else if (username.trim().isEmpty() && password.trim().isEmpty()) {
             setTextError("Please input email and password!");
         } else if (username.trim().isEmpty()) {
@@ -94,9 +103,17 @@ public class LoginActivity extends AppCompatActivity {
                     finish();
                 }
 
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onFail(String message) {
                     if (message.contains("Invalid username or password!")) {
+                        setTextError(message);
+                    } else if (message.contains("Please verify your account first")) {
+                        VerifyAccountDialog dialog = new VerifyAccountDialog(LoginActivity.this);
+                        dialog.setCancelable(false);
+                        dialog.create();
+                        dialog.show();
+                    } else {
                         setTextError(message);
                     }
                 }
@@ -109,24 +126,4 @@ public class LoginActivity extends AppCompatActivity {
         tvErrorLogin.setText(message);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void forgotPassword() {
-        SendEmailDialog dialog = new SendEmailDialog(context);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-
-        //lấy kích thước màn hình
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-
-        layoutParams.width  = size.x - 50;
-        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-
-        dialog.setCancelable(false);
-        dialog.getWindow().setAttributes(layoutParams);
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        dialog.create();
-        dialog.show();
-    }
 }

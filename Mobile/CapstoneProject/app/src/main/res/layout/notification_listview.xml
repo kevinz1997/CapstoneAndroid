@@ -2,41 +2,49 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:weightSum="10">
+        android:layout_height="@dimen/dp50"
+        android:weightSum="13">
 
         <TextView
+            android:id="@+id/tv_message"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="8"
-            android:text="Approver:"/>
+            android:layout_marginLeft="@dimen/dp15"
+            android:layout_marginRight="@dimen/dp5"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@color/colortext"
+            android:textSize="@dimen/sp17"
+            android:text="You recieve request from ActorName"/>
 
-        <TextView
-            android:id="@+id/tv_Approver"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"/>
-    </LinearLayout>
+            android:layout_gravity="center">
 
-    <LinearLayout
+            <ImageView
+                android:id="@+id/img_is_handled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_checked"
+                android:visibility="visible"
+                android:layout_marginRight="@dimen/dp5"/>
+        </LinearLayout>
+    </LinearLayout>
+    <View
+        android:id="@+id/line_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:weightSum="10">
+        android:layout_height="@dimen/dp1"
+        android:layout_marginTop="@dimen/dp5"
+        android:layout_marginBottom="@dimen/dp5"
+        android:layout_marginRight="@dimen/dp10"
+        android:layout_marginLeft="@dimen/dp10"
+        android:background="@color/light_gray"
+        android:visibility="gone"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="8"
-            android:text="Message:"/>
-
-        <TextView
-            android:id="@+id/tv_Message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2" />
-    </LinearLayout>
 </LinearLayout>

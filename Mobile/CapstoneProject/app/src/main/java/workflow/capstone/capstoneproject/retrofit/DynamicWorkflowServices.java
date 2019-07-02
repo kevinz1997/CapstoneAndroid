@@ -6,14 +6,15 @@ import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 import workflow.capstone.capstoneproject.api.Request;
+import workflow.capstone.capstoneproject.api.UpdateProfileModel;
 
 public interface DynamicWorkflowServices {
     @Headers({"Content-Type:application/json"})
@@ -22,6 +23,25 @@ public interface DynamicWorkflowServices {
 
     @GET(ConfigApi.Api.GET_PROFILE)
     Call<ResponseBody> getProfile();
+
+    @Headers({"Content-Type:application/json"})
+    @PUT(ConfigApi.Api.UPDATE_PROFILE)
+    Call<ResponseBody> updateProfile(@Body UpdateProfileModel model);
+
+    @PUT(ConfigApi.Api.CHANGE_PASSWORD)
+    Call<ResponseBody> changePassword(@Query(value = "password", encoded = true) String password);
+
+    @POST(ConfigApi.Api.FORGOT_PASSWORD)
+    Call<ResponseBody> forgotPassword(@Query(value = "email", encoded = true) String email);
+
+    @PUT(ConfigApi.Api.CONFIRM_FORGOT_PASSWORD)
+    Call<ResponseBody> confirmForgotPassword(@Query(value = "code", encoded = true) String code,
+                                             @Query(value = "email", encoded = true) String email,
+                                             @Query(value = "password", encoded = true) String password);
+
+    @POST(ConfigApi.Api.VERIFY_ACCOUNT)
+    Call<ResponseBody> verifyAccount(@Query(value = "code", encoded = true) String code,
+                                     @Query(value = "email", encoded = true) String email);
 
     @GET(ConfigApi.Api.GET_WORKFLOW)
     Call<ResponseBody> getWorkflow();
@@ -47,12 +67,4 @@ public interface DynamicWorkflowServices {
     Call<ResponseBody> uploadMultipleFile(
             @Part MultipartBody.Part[] files
     );
-
-    @POST(ConfigApi.Api.FORGOT_PASSWORD)
-    Call<ResponseBody> forgotPassword(@Field("email") String email);
-
-    @PUT(ConfigApi.Api.CONFIRM_FORGOT_PASSWORD)
-    Call<ResponseBody> confirmForgotPassword(@Field("code") String code,
-                                             @Field("email") String email,
-                                             @Field("password") String password);
 }
