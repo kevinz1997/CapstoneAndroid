@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,8 @@ import workflow.capstone.capstoneproject.R;
 import workflow.capstone.capstoneproject.adapter.ListFileNameAdapter;
 import workflow.capstone.capstoneproject.api.ActionValue;
 import workflow.capstone.capstoneproject.api.Request;
+import workflow.capstone.capstoneproject.entities.Connection;
+import workflow.capstone.capstoneproject.entities.DynamicButton;
 import workflow.capstone.capstoneproject.repository.CapstoneRepository;
 import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
 import workflow.capstone.capstoneproject.utils.CallBackData;
@@ -50,12 +53,14 @@ import workflow.capstone.capstoneproject.utils.KProgressHUDManager;
 
 public class SendRequestFragment extends Fragment {
 
+    private LinearLayout lnButton;
     private ImageView imgBack;
     private ImageView imgUploadFile;
     private ImageView imgUploadImage;
     private EditText edtReason;
     private Button btnSend;
     private TextView tvNameOfWorkFlow;
+    private TextView tvAttachment;
     private ListView listView;
     private CapstoneRepository capstoneRepository;
     private String token = null;
@@ -86,6 +91,8 @@ public class SendRequestFragment extends Fragment {
 
         token = DynamicWorkflowSharedPreferences.getStoreJWT(getContext(), ConstantDataManager.AUTHORIZATION_TOKEN);
 
+        buildDynamicForm(bundle.getString("workFlowTemplateID"));
+
         imgUploadFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,12 +109,12 @@ public class SendRequestFragment extends Fragment {
             }
         });
 
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendRequest(bundle.getString("workFlowTemplateID"));
-            }
-        });
+//        btnSend.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                sendRequest(bundle.getString("workFlowTemplateID"));
+//            }
+//        });
 
         tvNameOfWorkFlow.setText(bundle.getString("nameOfWorkflow"));
         return view;
@@ -169,13 +176,41 @@ public class SendRequestFragment extends Fragment {
     }
 
     private void initView(View view) {
+        lnButton = view.findViewById(R.id.ln_button);
         imgBack = view.findViewById(R.id.img_Back);
         edtReason = view.findViewById(R.id.edt_Reason);
-        btnSend = view.findViewById(R.id.btn_Send);
+//        btnSend = view.findViewById(R.id.btn_Send);
         tvNameOfWorkFlow = view.findViewById(R.id.tv_name_of_workflow);
         imgUploadFile = view.findViewById(R.id.img_upload_file);
         imgUploadImage = view.findViewById(R.id.img_upload_image);
         listView = view.findViewById(R.id.list_file_name);
+        tvAttachment = view.findViewById(R.id.tv_attachment);
+    }
+
+    private void buildDynamicForm(final String workFlowTemplateID) {
+        capstoneRepository = new CapstoneRepositoryImpl();
+        capstoneRepository.getRequestForm(token, workFlowTemplateID, new CallBackData<DynamicButton>() {
+            @Override
+            public void onSuccess(DynamicButton dynamicButton) {
+                final List<Connection> connectionList = dynamicButton.getConnections();
+                for (final Connection connection : connectionList) {
+                    Button btn = new Button(getContext());
+                    btn.setText(connection.getConnectionTypeName());
+                    btn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            sendRequest(workFlowTemplateID, connection.getNextStepID());
+                        }
+                    });
+                    lnButton.addView(btn);
+                }
+            }
+
+            @Override
+            public void onFail(String message) {
+                Toasty.error(getContext(), message, Toasty.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -219,12 +254,15 @@ public class SendRequestFragment extends Fragment {
     }
 
     private void configListView() {
+        if (listName.size() > 0) {
+            tvAttachment.setVisibility(View.VISIBLE);
+        }
         listFileNameAdapter = new ListFileNameAdapter(getContext(), listName);
         listView.setAdapter(listFileNameAdapter);
         listView.setVisibility(View.VISIBLE);
     }
 
-    private void sendRequest(String workFlowTemplateID) {
+    private void sendRequest(String workFlowTemplateID, String nextStepID) {
         if (token != null) {
             ActionValue actionValue = new ActionValue();
             actionValue.setKey("text");
@@ -236,7 +274,7 @@ public class SendRequestFragment extends Fragment {
             Request request = new Request();
             request.setDescription("Xin nghi hoc");
             request.setWorkFlowTemplateID(workFlowTemplateID);
-            request.setNextStepID("2bf006ca-5491-46f3-7c54-08d6fa1150f8");
+            request.setNextStepID(nextStepID);
             request.setStatus(1);
             request.setActionValues(actionValues);
             request.setImagePaths(listPath);

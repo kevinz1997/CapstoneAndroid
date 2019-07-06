@@ -20,6 +20,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
+import workflow.capstone.capstoneproject.entities.DynamicButton;
+import workflow.capstone.capstoneproject.entities.HandleFormRequest;
 import workflow.capstone.capstoneproject.entities.Login;
 import workflow.capstone.capstoneproject.entities.Profile;
 import workflow.capstone.capstoneproject.entities.UserNotification;
@@ -453,6 +455,120 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
                             Type type = new TypeToken<String[]>() {
                             }.getType();
                             String[] responseResult = new Gson().fromJson(result, type);
+                            if (responseResult == null) {
+                                callBackData.onFail(response.message());
+                            }
+                            callBackData.onSuccess(responseResult);
+                        } catch (JsonSyntaxException jsonError) {
+                            jsonError.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        callBackData.onFail(response.message());
+                    }
+                } else if (response.code() == 400) {
+                    callBackData.onFail(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callBackData.onFail(call.toString());
+            }
+        });
+    }
+
+    @Override
+    public void getRequestForm(String token, String workflowTemplateID, final CallBackData<DynamicButton> callBackData) {
+        Call<ResponseBody> serviceCall = clientApi.getDWServices(token).getRequestForm(workflowTemplateID);
+        Log.e("URL=", clientApi.getDWServices(token).getRequestForm(workflowTemplateID).request().url().toString());
+        serviceCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    if (response.code() == 200) {
+                        try {
+                            String result = response.body().string();
+                            Type type = new TypeToken<DynamicButton>() {
+                            }.getType();
+                            DynamicButton responseResult = new Gson().fromJson(result, type);
+                            if (responseResult == null) {
+                                callBackData.onFail(response.message());
+                            }
+                            callBackData.onSuccess(responseResult);
+                        } catch (JsonSyntaxException jsonError) {
+                            jsonError.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        callBackData.onFail(response.message());
+                    }
+                } else if (response.code() == 400) {
+                    callBackData.onFail(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callBackData.onFail(call.toString());
+            }
+        });
+    }
+
+    @Override
+    public void getRequestHandleForm(String token, String requestActionID, final CallBackData<HandleFormRequest> callBackData) {
+        Call<ResponseBody> serviceCall = clientApi.getDWServices(token).getRequestHandleForm(requestActionID);
+        Log.e("URL=", clientApi.getDWServices(token).getRequestHandleForm(requestActionID).request().url().toString());
+        serviceCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    if (response.code() == 200) {
+                        try {
+                            String result = response.body().string();
+                            Type type = new TypeToken<HandleFormRequest>() {
+                            }.getType();
+                            HandleFormRequest responseResult = new Gson().fromJson(result, type);
+                            if (responseResult == null) {
+                                callBackData.onFail(response.message());
+                            }
+                            callBackData.onSuccess(responseResult);
+                        } catch (JsonSyntaxException jsonError) {
+                            jsonError.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        callBackData.onFail(response.message());
+                    }
+                } else if (response.code() == 400) {
+                    callBackData.onFail(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callBackData.onFail(call.toString());
+            }
+        });
+    }
+
+    @Override
+    public void getAccountByUserID(String ID, final CallBackData<List<Profile>> callBackData) {
+        Call<ResponseBody> serviceCall = clientApi.getDynamicWorkflowServices().getAccountByUserID(ID);
+        Log.e("URL=", clientApi.getDynamicWorkflowServices().getAccountByUserID(ID).request().url().toString());
+        serviceCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    if (response.code() == 200) {
+                        try {
+                            String result = response.body().string();
+                            Type type = new TypeToken<List<Profile>>() {
+                            }.getType();
+                            List<Profile> responseResult = new Gson().fromJson(result, type);
                             if (responseResult == null) {
                                 callBackData.onFail(response.message());
                             }

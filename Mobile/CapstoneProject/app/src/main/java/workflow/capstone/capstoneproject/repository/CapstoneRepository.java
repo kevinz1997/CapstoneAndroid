@@ -8,6 +8,8 @@ import java.util.Map;
 import okhttp3.MultipartBody;
 import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
+import workflow.capstone.capstoneproject.entities.DynamicButton;
+import workflow.capstone.capstoneproject.entities.HandleFormRequest;
 import workflow.capstone.capstoneproject.entities.Login;
 import workflow.capstone.capstoneproject.entities.Profile;
 import workflow.capstone.capstoneproject.entities.UserNotification;
@@ -40,4 +42,10 @@ public interface CapstoneRepository {
     void postRequestFile(String token, MultipartBody.Part file, CallBackData<String[]> callBackData);
 
     void postMultipleRequestFile(String token, MultipartBody.Part[] files, CallBackData<String[]> callBackData);
+
+    void getRequestForm(String token, String workflowTemplateID, CallBackData<DynamicButton> callBackData);
+
+    void getRequestHandleForm(String token, String requestActionID, CallBackData<HandleFormRequest> callBackData);
+
+    void getAccountByUserID(String ID, CallBackData<List<Profile>> callBackData);
 }

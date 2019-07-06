@@ -67,4 +67,13 @@ public interface DynamicWorkflowServices {
     Call<ResponseBody> uploadMultipleFile(
             @Part MultipartBody.Part[] files
     );
+
+    @GET(ConfigApi.Api.GET_REQUEST_FORM)
+    Call<ResponseBody> getRequestForm(@Query(value = "workFlowTemplateID", encoded = true) String workFlowTemplateID);
+
+    @GET(ConfigApi.Api.GET_REQUEST_HANDLE_FORM)
+    Call<ResponseBody> getRequestHandleForm(@Query(value = "requestActionID", encoded = true) String requestActionID);
+
+    @GET(ConfigApi.Api.GET_ACCOUNT_BY_USER_ID)
+    Call<ResponseBody> getAccountByUserID(@Query(value = "ID", encoded = true) String ID);
 }

@@ -56,6 +56,7 @@ public class NotificationAdapter extends BaseAdapter {
         }
         UserNotification userNotification = this.listData.get(position);
         holder.tvMessage.setText(userNotification.getMessage() + " from " + userNotification.getActorName());
+
         if (userNotification.getIsHandled()) {
             holder.imgIsHandled.setVisibility(View.VISIBLE);
         } else {

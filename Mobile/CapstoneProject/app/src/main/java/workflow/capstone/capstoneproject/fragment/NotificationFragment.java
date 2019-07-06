@@ -3,6 +3,8 @@ package workflow.capstone.capstoneproject.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
 import workflow.capstone.capstoneproject.utils.CallBackData;
 import workflow.capstone.capstoneproject.utils.ConstantDataManager;
 import workflow.capstone.capstoneproject.utils.DynamicWorkflowSharedPreferences;
+import workflow.capstone.capstoneproject.utils.FragmentUtils;
 
 public class NotificationFragment extends Fragment {
 
@@ -38,6 +41,8 @@ public class NotificationFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
 
+        listView = view.findViewById(R.id.list_notification);
+
         loadNotifications();
         return view;
     }
@@ -48,7 +53,6 @@ public class NotificationFragment extends Fragment {
         capstoneRepository.getNotification(token, new CallBackData<List<UserNotification>>() {
             @Override
             public void onSuccess(List<UserNotification> userNotifications) {
-                listView = getView().findViewById(R.id.list_notification);
                 notificationList = userNotifications;
                 notificationAdapter = new NotificationAdapter(notificationList, getContext());
                 listView.setAdapter(notificationAdapter);
@@ -65,9 +69,20 @@ public class NotificationFragment extends Fragment {
     private void onItemClick(final ListView listView) {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                UserNotification userNotification = (UserNotification) parent.getItemAtPosition(position);
-                Toasty.success(getContext(), userNotification.getEventID() + userNotification.getNotificationTypeName(), Toasty.LENGTH_LONG).show();
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Fragment fragment = new HandleRequestFragment();
+                Bundle bundle = new Bundle();
+                UserNotification userNotification = (UserNotification) adapterView.getItemAtPosition(position);
+                String requestActionID = userNotification.getEventID();
+                bundle.putString("requestActionID", requestActionID);
+                fragment.setArguments(bundle);
+
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                fragmentTransaction.replace(R.id.main_frame, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
     }
