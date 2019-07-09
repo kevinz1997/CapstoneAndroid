@@ -8,9 +8,11 @@ public class RequestFile {
     @SerializedName("id")
     @Expose
     private String id;
+
     @SerializedName("path")
     @Expose
     private String path;
+
     @SerializedName("isDeleted")
     @Expose
     private Boolean isDeleted;

@@ -50,6 +50,8 @@ public class ViewProfileFragment extends Fragment {
     private String strDateOfBirth;
     private CapstoneRepository capstoneRepository;
     private String token;
+    private Profile profile;
+    private String newDateOfBirth;
 
     public ViewProfileFragment() {
         // Required empty public constructor
@@ -72,30 +74,20 @@ public class ViewProfileFragment extends Fragment {
             }
         });
 
-        capstoneRepository = new CapstoneRepositoryImpl();
-        capstoneRepository.getProfile(token, new CallBackData<List<Profile>>() {
-            @Override
-            public void onSuccess(List<Profile> profiles) {
-                edtFullName.setText(profiles.get(0).getFullName());
-                tvEmail.setText(profiles.get(0).getEmail());
-                try {
-                    Date date = new SimpleDateFormat("yyyy-MM-dd").parse(profiles.get(0).getDateOfBirth());
-                    strDateOfBirth = new SimpleDateFormat("dd/MM/yyyy").format(date);
+        profile = DynamicWorkflowSharedPreferences.getStoredData(getContext(), ConstantDataManager.PROFILE_KEY, ConstantDataManager.PROFILE_NAME);
+        edtFullName.setText(profile.getFullName());
+        tvEmail.setText(profile.getEmail());
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd").parse(profile.getDateOfBirth());
+            strDateOfBirth = new SimpleDateFormat("dd-MM-yyyy").format(date);
 
-                    dayOfBirth = date.getDate();
-                    monthOfBirth = date.getMonth();
-                    yearOfBirth = date.getYear() + 1900;
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                tvBirthDay.setText(strDateOfBirth);
-            }
-
-            @Override
-            public void onFail(String message) {
-
-            }
-        });
+            dayOfBirth = date.getDate();
+            monthOfBirth = date.getMonth();
+            yearOfBirth = date.getYear() + 1900;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        tvBirthDay.setText(strDateOfBirth);
 
         imgEditFullname.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -117,7 +109,7 @@ public class ViewProfileFragment extends Fragment {
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         Calendar calendar = Calendar.getInstance();
                         calendar.set(year, month, dayOfMonth);
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
                         tvBirthDay.setText(simpleDateFormat.format(calendar.getTime()));
                     }
                 }, yearOfBirth, monthOfBirth, dayOfBirth);
@@ -136,11 +128,24 @@ public class ViewProfileFragment extends Fragment {
                 } else if (edtFullName.getText().toString().trim().isEmpty()) {
                     configDialog(false, true, getResources().getString(R.string.input_all_fields), false, getResources().getString(R.string.close));
                 } else {
-                    UpdateProfileModel model = new UpdateProfileModel(edtFullName.getText().toString(), tvBirthDay.getText().toString());
+
+                    try {
+                        Date date = new SimpleDateFormat("dd-MM-yyyy").parse(tvBirthDay.getText().toString());
+                        newDateOfBirth = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(date);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    UpdateProfileModel model = new UpdateProfileModel(edtFullName.getText().toString(), newDateOfBirth);
+
                     capstoneRepository = new CapstoneRepositoryImpl();
                     capstoneRepository.updateProfile(getContext(), token, model, new CallBackData<String>() {
                         @Override
                         public void onSuccess(String s) {
+                            profile.setFullName(edtFullName.getText().toString());
+
+                            profile.setDateOfBirth(newDateOfBirth);
+                            DynamicWorkflowSharedPreferences.storeData(getContext(), ConstantDataManager.PROFILE_KEY, ConstantDataManager.PROFILE_NAME, profile);
                             configDialog(true, false, getResources().getString(R.string.change_profile_success), true, getResources().getString(R.string.ok));
                         }
 

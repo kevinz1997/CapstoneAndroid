@@ -24,7 +24,7 @@
         app:civ_border_width="1dp" />
 
     <TextView
-        android:id="@+id/tv_fullname"
+        android:id="@+id/tv_full_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/img_avatar"
@@ -37,7 +37,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/tv_fullname"
+        android:layout_below="@id/tv_full_name"
         android:layout_centerVertical="true"
         android:layout_marginTop="@dimen/dp30"
         android:orientation="vertical">

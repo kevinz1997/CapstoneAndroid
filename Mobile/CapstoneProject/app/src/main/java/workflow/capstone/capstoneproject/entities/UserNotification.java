@@ -6,21 +6,31 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class UserNotification implements Serializable {
+
     @SerializedName("eventID")
     @Expose
     private String eventID;
+
     @SerializedName("message")
     @Expose
     private String message;
+
     @SerializedName("actorName")
     @Expose
     private String actorName;
+
     @SerializedName("notificationType")
     @Expose
     private Integer notificationType;
+
     @SerializedName("notificationTypeName")
     @Expose
     private String notificationTypeName;
+
+    @SerializedName("createDate")
+    @Expose
+    private String createDate;
+
     @SerializedName("isHandled")
     @Expose
     private Boolean isHandled;
@@ -63,6 +73,14 @@ public class UserNotification implements Serializable {
 
     public void setNotificationTypeName(String notificationTypeName) {
         this.notificationTypeName = notificationTypeName;
+    }
+
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
     }
 
     public Boolean getIsHandled() {

@@ -7,17 +7,19 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp50"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/dp5"
+        android:paddingBottom="@dimen/dp5"
         android:weightSum="11">
 
         <TextView
             android:id="@+id/tv_message"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/dp15"
             android:layout_marginRight="@dimen/dp5"
             android:layout_weight="1"
-            android:gravity="center_vertical"
+            android:layout_gravity="center"
             android:text="You recieve request from ActorName"
             android:textColor="@color/colortext"
             android:textSize="@dimen/sp17" />
@@ -35,6 +37,14 @@
                 android:visibility="visible" />
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_create_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dp20"
+        android:text="14/04/2019"
+        android:textSize="@dimen/sp15" />
 
     <View
         android:id="@+id/line_view"

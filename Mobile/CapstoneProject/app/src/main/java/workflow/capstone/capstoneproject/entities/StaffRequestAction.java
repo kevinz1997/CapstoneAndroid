@@ -9,12 +9,14 @@ public class StaffRequestAction {
     @SerializedName("name")
     @Expose
     private String name;
+
     @SerializedName("createDate")
     @Expose
     private String createDate;
+
     @SerializedName("requestValues")
     @Expose
-    private List<RequestValue> requestValues = null;
+    private List<RequestValue> requestValues;
 
     public String getName() {
         return name;

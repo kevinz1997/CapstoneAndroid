@@ -1,27 +1,23 @@
 package workflow.capstone.capstoneproject.activity;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
-import es.dmoral.toasty.Toasty;
+import java.util.List;
+
 import workflow.capstone.capstoneproject.R;
-import workflow.capstone.capstoneproject.adapter.TabAdapter;
+import workflow.capstone.capstoneproject.entities.Profile;
 import workflow.capstone.capstoneproject.fragment.NotificationFragment;
 import workflow.capstone.capstoneproject.fragment.ProfileFragment;
 import workflow.capstone.capstoneproject.fragment.RequestHistoryFragment;
@@ -31,7 +27,6 @@ import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
 import workflow.capstone.capstoneproject.utils.CallBackData;
 import workflow.capstone.capstoneproject.utils.ConstantDataManager;
 import workflow.capstone.capstoneproject.utils.DynamicWorkflowSharedPreferences;
-import workflow.capstone.capstoneproject.utils.FragmentUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private RequestHistoryFragment requestHistoryFragment;
     private NotificationFragment notificationFragment;
     private ProfileFragment profileFragment;
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +57,21 @@ public class MainActivity extends AppCompatActivity {
                         tabLayout.setVisibility(isOpen ? View.GONE : View.VISIBLE);
                     }
                 });
+        token = DynamicWorkflowSharedPreferences.getStoreJWT(context, ConstantDataManager.AUTHORIZATION_TOKEN);
+
+        capstoneRepository = new CapstoneRepositoryImpl();
+        capstoneRepository.getProfile(token, new CallBackData<List<Profile>>() {
+            @Override
+            public void onSuccess(List<Profile> listProfile) {
+                Profile profile = listProfile.get(0);
+                DynamicWorkflowSharedPreferences.storeData(context, ConstantDataManager.PROFILE_KEY, ConstantDataManager.PROFILE_NAME, profile);
+            }
+
+            @Override
+            public void onFail(String message) {
+
+            }
+        });
     }
 
     private void initTabLayout() {
@@ -91,9 +102,8 @@ public class MainActivity extends AppCompatActivity {
         imageView = view.findViewById(R.id.notification_icon);
         imageView.setImageResource(R.drawable.ic_notification_grey);
         badge = view.findViewById(R.id.notification_badge);
-        String tokenAuthorize = DynamicWorkflowSharedPreferences.getStoreJWT(context, ConstantDataManager.AUTHORIZATION_TOKEN);
         capstoneRepository = new CapstoneRepositoryImpl();
-        capstoneRepository.getNumberOfNotification(tokenAuthorize, new CallBackData<String>() {
+        capstoneRepository.getNumberOfNotification(token, new CallBackData<String>() {
             @Override
             public void onSuccess(String s) {
                 if (Integer.parseInt(s) > 0) {

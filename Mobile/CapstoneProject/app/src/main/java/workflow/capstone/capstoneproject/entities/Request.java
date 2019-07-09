@@ -8,15 +8,19 @@ public class Request {
     @SerializedName("id")
     @Expose
     private String id;
+
     @SerializedName("description")
     @Expose
     private String description;
+
     @SerializedName("initiatorID")
     @Expose
     private String initiatorID;
+
     @SerializedName("workFlowTemplateID")
     @Expose
     private String workFlowTemplateID;
+
     @SerializedName("createDate")
     @Expose
     private String createDate;

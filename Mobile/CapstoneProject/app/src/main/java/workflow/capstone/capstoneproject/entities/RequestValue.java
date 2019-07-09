@@ -8,9 +8,11 @@ public class RequestValue {
     @SerializedName("id")
     @Expose
     private String id;
+
     @SerializedName("key")
     @Expose
     private String key;
+
     @SerializedName("value")
     @Expose
     private String value;

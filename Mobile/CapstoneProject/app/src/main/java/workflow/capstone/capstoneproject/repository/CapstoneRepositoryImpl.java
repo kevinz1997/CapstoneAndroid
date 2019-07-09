@@ -19,6 +19,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import workflow.capstone.capstoneproject.api.Request;
+import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
 import workflow.capstone.capstoneproject.entities.DynamicButton;
 import workflow.capstone.capstoneproject.entities.HandleFormRequest;
@@ -38,14 +39,13 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
         Call<ResponseBody> serviceCall = clientApi.getDynamicWorkflowServices().login(fields);
         Log.e("URL=", clientApi.getDynamicWorkflowServices().login(fields).request().url().toString());
         //show progress bar
-        final KProgressHUD khub = KProgressHUDManager.showProgressBar(context);
+        final KProgressHUD progressHUD = KProgressHUDManager.showProgressBar(context);
 
         serviceCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-
                 //close progress bar
-                KProgressHUDManager.dismiss(context, khub);
+                progressHUD.dismiss();
                 if (response != null && response.body() != null) {
                     if (response.code() == 200) {
                         try {
@@ -128,12 +128,12 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     public void updateProfile(Context context, String token, UpdateProfileModel model, final CallBackData<String> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDWServices(token).updateProfile(model);
         Log.e("URL=", clientApi.getDWServices(token).updateProfile(model).request().url().toString());
-        final KProgressHUD khub = KProgressHUDManager.showProgressBar(context);
+        final KProgressHUD progressHUD = KProgressHUDManager.showProgressBar(context);
 
         serviceCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                khub.dismiss();
+                progressHUD.dismiss();
                 if (response != null && response.body() != null) {
                     if (response.code() == 200) {
                         try {
@@ -169,12 +169,12 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     public void changePassword(Context context, String token, String password, final CallBackData<String> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDWServices(token).changePassword(password);
         Log.e("URL=", clientApi.getDWServices(token).changePassword(password).request().url().toString());
-        final KProgressHUD khub = KProgressHUDManager.showProgressBar(context);
+        final KProgressHUD progressHUD = KProgressHUDManager.showProgressBar(context);
 
         serviceCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                khub.dismiss();
+                progressHUD.dismiss();
                 if (response != null && response.body() != null) {
                     if (response.code() == 200) {
                         try {
@@ -210,12 +210,12 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     public void verifyAccount(Context context, String code, String email, final CallBackData<String> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDynamicWorkflowServices().verifyAccount(code, email);
         Log.e("URL=", clientApi.getDynamicWorkflowServices().verifyAccount(code, email).request().url().toString());
-        final KProgressHUD khub = KProgressHUDManager.showProgressBar(context);
+        final KProgressHUD progressHUD = KProgressHUDManager.showProgressBar(context);
 
         serviceCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                khub.dismiss();
+                progressHUD.dismiss();
                 if (response != null && response.body() != null) {
                     if (response.code() == 200) {
                         try {
@@ -594,15 +594,53 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     }
 
     @Override
+    public void approveRequest(String token, RequestApprove requestApprove, final CallBackData<String> callBackData) {
+        Call<ResponseBody> serviceCall = clientApi.getDWServices(token).approveRequest(requestApprove);
+        Log.e("URL=", clientApi.getDWServices(token).approveRequest(requestApprove).request().url().toString());
+        serviceCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    if (response.code() == 201) {
+                        try {
+                            String result = response.body().string();
+                            Type type = new TypeToken<String>() {
+                            }.getType();
+                            String responseResult = new Gson().fromJson(result, type);
+                            if (responseResult == null) {
+                                callBackData.onFail(response.message());
+                            }
+                            callBackData.onSuccess(responseResult);
+                        } catch (JsonSyntaxException jsonError) {
+                            jsonError.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        callBackData.onFail(response.message());
+                    }
+                } else if (response.code() == 400) {
+                    callBackData.onFail(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callBackData.onFail(call.toString());
+            }
+        });
+    }
+
+    @Override
     public void forgotPassword(Context context, String email, final CallBackData<String> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDynamicWorkflowServices().forgotPassword(email);
         Log.e("URL=", clientApi.getDynamicWorkflowServices().forgotPassword(email).request().url().toString());
 
-        final KProgressHUD khub = KProgressHUDManager.showProgressBar(context);
+        final KProgressHUD progressHUD = KProgressHUDManager.showProgressBar(context);
         serviceCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                khub.dismiss();
+                progressHUD.dismiss();
                 if (response != null && response.body() != null) {
                     if (response.code() == 200) {
                         try {
@@ -638,12 +676,12 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     public void confirmForgotPassword(Context context, String code, String email, String newPassword, final CallBackData<String> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDynamicWorkflowServices().confirmForgotPassword(code, email, newPassword);
         Log.e("URL=", clientApi.getDynamicWorkflowServices().confirmForgotPassword(code, email, newPassword).request().url().toString());
-        final KProgressHUD khub = KProgressHUDManager.showProgressBar(context);
+        final KProgressHUD progressHUD = KProgressHUDManager.showProgressBar(context);
 
         serviceCall.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                khub.dismiss();
+                progressHUD.dismiss();
                 if (response != null && response.body() != null) {
                     if (response.code() == 200) {
                         try {

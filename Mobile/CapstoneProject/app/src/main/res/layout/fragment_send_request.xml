@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -60,12 +60,13 @@
                     android:layout_marginRight="@dimen/dp10"
                     android:layout_weight="3"
                     android:textColor="@color/colortext"
-                    android:textSize="@dimen/sp18" />
+                    android:textSize="@dimen/sp20" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp10"
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:weightSum="10">
@@ -80,11 +81,18 @@
                     android:textSize="@dimen/sp15" />
 
                 <EditText
+                    android:padding="@dimen/dp7"
                     android:id="@+id/edt_Reason"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="@dimen/dp10"
                     android:layout_weight="3"
+                    android:background="@drawable/border_radius"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:maxLines="8"
+                    android:minLines="8"
+                    android:scrollbars="vertical"
                     android:textColor="@color/colortext"
                     android:textSize="@dimen/sp18" />
 
@@ -165,19 +173,20 @@
                     android:id="@+id/ln_button"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginBottom="@dimen/dp15"
                     android:layout_weight="7"
                     android:gravity="center"
                     android:orientation="horizontal">
 
                     <!--<Button-->
-                        <!--android:id="@+id/btn_Send"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:background="@drawable/btn_login"-->
-                        <!--android:gravity="center"-->
-                        <!--android:text="Send"-->
-                        <!--android:textColor="@color/white"-->
-                        <!--android:textSize="@dimen/sp18" />-->
+                    <!--android:id="@+id/btn_Send"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@drawable/btn_login"-->
+                    <!--android:gravity="center"-->
+                    <!--android:text="Send"-->
+                    <!--android:textColor="@color/white"-->
+                    <!--android:textSize="@dimen/sp18" />-->
 
                     <!--<Button-->
                     <!--android:id="@+id/btn_r"-->
@@ -198,4 +207,4 @@
     </LinearLayout>
     <!--</ScrollView>-->
 
-</FrameLayout>
+</ScrollView>

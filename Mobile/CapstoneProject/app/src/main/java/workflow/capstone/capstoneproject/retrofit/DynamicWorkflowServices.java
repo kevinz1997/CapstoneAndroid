@@ -14,6 +14,7 @@ import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Query;
 import workflow.capstone.capstoneproject.api.Request;
+import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
 
 public interface DynamicWorkflowServices {
@@ -76,4 +77,9 @@ public interface DynamicWorkflowServices {
 
     @GET(ConfigApi.Api.GET_ACCOUNT_BY_USER_ID)
     Call<ResponseBody> getAccountByUserID(@Query(value = "ID", encoded = true) String ID);
+
+    @Headers({"Content-Type:application/json"})
+    @POST(ConfigApi.Api.APPROVE_REQUEST)
+    Call<ResponseBody> approveRequest(@Body RequestApprove requestApprove);
+
 }

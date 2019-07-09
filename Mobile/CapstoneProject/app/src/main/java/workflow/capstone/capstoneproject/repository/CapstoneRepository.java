@@ -7,6 +7,7 @@ import java.util.Map;
 
 import okhttp3.MultipartBody;
 import workflow.capstone.capstoneproject.api.Request;
+import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
 import workflow.capstone.capstoneproject.entities.DynamicButton;
 import workflow.capstone.capstoneproject.entities.HandleFormRequest;
@@ -48,4 +49,6 @@ public interface CapstoneRepository {
     void getRequestHandleForm(String token, String requestActionID, CallBackData<HandleFormRequest> callBackData);
 
     void getAccountByUserID(String ID, CallBackData<List<Profile>> callBackData);
+
+    void approveRequest(String token, RequestApprove requestApprove, CallBackData<String> callBackData);
 }

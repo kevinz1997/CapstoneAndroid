@@ -31,8 +31,7 @@ public class ProfileFragment extends Fragment {
     private LinearLayout lnViewProfile;
     private LinearLayout lnChangePassword;
     private LinearLayout lnSignOut;
-    private CapstoneRepository capstoneRepository;
-    String token;
+    private TextView tvFullName;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -44,6 +43,11 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        tvFullName = view.findViewById(R.id.tv_full_name);
+        Profile profile = DynamicWorkflowSharedPreferences.getStoredData(getContext(), ConstantDataManager.PROFILE_KEY, ConstantDataManager.PROFILE_NAME);
+        tvFullName.setText(profile.getFullName());
+
         lnViewProfile = view.findViewById(R.id.ln_view_profile);
         lnViewProfile.setOnClickListener(new View.OnClickListener() {
             @Override

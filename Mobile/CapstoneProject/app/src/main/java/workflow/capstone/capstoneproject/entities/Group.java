@@ -8,9 +8,11 @@ public class Group {
     @SerializedName("id")
     @Expose
     private String id;
+
     @SerializedName("name")
     @Expose
     private String name;
+
     @SerializedName("isDeleted")
     @Expose
     private Boolean isDeleted;

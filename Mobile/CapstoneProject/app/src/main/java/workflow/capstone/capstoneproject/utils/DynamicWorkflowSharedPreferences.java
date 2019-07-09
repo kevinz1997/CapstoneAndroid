@@ -37,7 +37,7 @@ public class DynamicWorkflowSharedPreferences {
         Gson gson = new Gson();
         String json = gson.toJson(object);
         editor.putString(key, json);
-        editor.commit();
+        editor.apply();
     }
 
     public static Profile getStoredData(Context context, String key, String name) {

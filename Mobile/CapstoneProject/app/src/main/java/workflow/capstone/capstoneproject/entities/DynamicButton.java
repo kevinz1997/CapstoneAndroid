@@ -7,9 +7,11 @@ import java.io.Serializable;
 import java.util.List;
 
 public class DynamicButton implements Serializable {
+
     @SerializedName("connections")
     @Expose
-    private List<Connection> connections = null;
+    private List<Connection> connections;
+
     @SerializedName("actionType")
     @Expose
     private ActionType actionType;

@@ -11,9 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.kaopiz.kprogresshud.KProgressHUD;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,17 +23,25 @@ import java.util.List;
 import es.dmoral.toasty.Toasty;
 import workflow.capstone.capstoneproject.R;
 import workflow.capstone.capstoneproject.adapter.CommentAdapter;
+import workflow.capstone.capstoneproject.adapter.ListFileNameAdapter;
+import workflow.capstone.capstoneproject.api.ActionValue;
+import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.entities.Comment;
 import workflow.capstone.capstoneproject.entities.Connection;
 import workflow.capstone.capstoneproject.entities.HandleFormRequest;
 import workflow.capstone.capstoneproject.entities.Profile;
+import workflow.capstone.capstoneproject.entities.Request;
+import workflow.capstone.capstoneproject.entities.RequestFile;
 import workflow.capstone.capstoneproject.entities.RequestValue;
+import workflow.capstone.capstoneproject.entities.StaffRequestAction;
 import workflow.capstone.capstoneproject.repository.CapstoneRepository;
 import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
 import workflow.capstone.capstoneproject.utils.CallBackData;
 import workflow.capstone.capstoneproject.utils.ConstantDataManager;
 import workflow.capstone.capstoneproject.utils.DynamicWorkflowSharedPreferences;
+import workflow.capstone.capstoneproject.utils.DynamicWorkflowUtils;
 import workflow.capstone.capstoneproject.utils.FragmentUtils;
+import workflow.capstone.capstoneproject.utils.KProgressHUDManager;
 
 public class HandleRequestFragment extends Fragment {
 
@@ -42,7 +52,11 @@ public class HandleRequestFragment extends Fragment {
     private String fullName;
     private ListView listViewComment;
     private List<Comment> commentList = new ArrayList<>();
+    private List<String> stringCommentList = new ArrayList<>();
     private CommentAdapter commentAdapter;
+    private ListView listViewFileName;
+    private List<String> fileNameList = new ArrayList<>();
+    private ListFileNameAdapter listFileNameAdapter;
     private ImageView imgBack;
     private LinearLayout lnButton;
     private String token = null;
@@ -62,13 +76,6 @@ public class HandleRequestFragment extends Fragment {
 
         initView(view);
 
-        imgSendComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateListComment();
-            }
-        });
-
         imgBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,6 +88,13 @@ public class HandleRequestFragment extends Fragment {
         final Bundle bundle = getArguments();
         getHandleForm(bundle.getString("requestActionID"));
 
+        imgSendComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateListComment();
+            }
+        });
+
         return view;
     }
 
@@ -88,6 +102,7 @@ public class HandleRequestFragment extends Fragment {
         imgSendComment = view.findViewById(R.id.img_send_comment);
         edtComment = view.findViewById(R.id.edt_comment);
         listViewComment = view.findViewById(R.id.list_comment);
+        listViewFileName = view.findViewById(R.id.list_file_name);
         imgBack = view.findViewById(R.id.img_Back);
         lnButton = view.findViewById(R.id.ln_button);
         tvFromName = view.findViewById(R.id.tv_from_name);
@@ -96,33 +111,30 @@ public class HandleRequestFragment extends Fragment {
 
     private void updateListComment() {
         stringComment = edtComment.getText().toString();
+        stringCommentList.add(stringComment);
 
-        String token = DynamicWorkflowSharedPreferences.getStoreJWT(getContext(), ConstantDataManager.AUTHORIZATION_TOKEN);
-        capstoneRepository = new CapstoneRepositoryImpl();
-        capstoneRepository.getProfile(token, new CallBackData<List<Profile>>() {
-            @Override
-            public void onSuccess(List<Profile> profiles) {
-                Profile profile = profiles.get(0);
-                fullName = profile.getFullName();
-                Comment comment = new Comment(stringComment, fullName);
-                edtComment.setText("");
-                commentList.add(comment);
-                commentAdapter = new CommentAdapter(commentList, getContext());
-                commentAdapter.notifyDataSetChanged();
-                listViewComment.setAdapter(commentAdapter);
-                listViewComment.setVisibility(View.VISIBLE);
-                setListViewHeightBasedOnChildren(listViewComment);
-                setOnLongClick(listViewComment);
-            }
-
-            @Override
-            public void onFail(String message) {
-
-            }
-        });
+        Profile profile = DynamicWorkflowSharedPreferences.getStoredData(getContext(), ConstantDataManager.PROFILE_KEY, ConstantDataManager.PROFILE_NAME);
+        fullName = profile.getFullName();
+        Comment comment = new Comment(stringComment, fullName);
+        edtComment.setText("");
+        commentList.add(comment);
+        commentAdapter = new CommentAdapter(commentList, getContext());
+        commentAdapter.notifyDataSetChanged();
+        listViewComment.setAdapter(commentAdapter);
+        listViewComment.setVisibility(View.VISIBLE);
+        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewComment);
+        setListViewCommentOnLongClick(listViewComment);
     }
 
-    private void setOnLongClick(ListView listView) {
+    private void getListComment() {
+        commentAdapter = new CommentAdapter(commentList, getContext());
+        commentAdapter.notifyDataSetChanged();
+        listViewComment.setAdapter(commentAdapter);
+        listViewComment.setVisibility(View.VISIBLE);
+        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewComment);
+    }
+
+    private void setListViewCommentOnLongClick(ListView listView) {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -132,13 +144,18 @@ public class HandleRequestFragment extends Fragment {
         });
     }
 
+    private void initFileNameListView() {
+        listFileNameAdapter = new ListFileNameAdapter(getContext(), fileNameList);
+        listViewFileName.setAdapter(listFileNameAdapter);
+        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewFileName);
+    }
+
     private void getHandleForm(String requestActionID) {
         capstoneRepository = new CapstoneRepositoryImpl();
         capstoneRepository.getRequestHandleForm(token, requestActionID, new CallBackData<HandleFormRequest>() {
             @Override
-            public void onSuccess(HandleFormRequest handleFormRequest) {
+            public void onSuccess(final HandleFormRequest handleFormRequest) {
                 final List<Connection> connectionList = handleFormRequest.getConnections();
-//                getAccountByUserID(handleFormRequest.getRequest().getInitiatorID());
                 capstoneRepository = new CapstoneRepositoryImpl();
                 capstoneRepository.getAccountByUserID(handleFormRequest.getRequest().getInitiatorID(), new CallBackData<List<Profile>>() {
                     @Override
@@ -152,19 +169,41 @@ public class HandleRequestFragment extends Fragment {
                     }
                 });
 
-                List<RequestValue> requestValueList = handleFormRequest.getUserRequestAction().getRequestValues();
-                for (RequestValue requestValue : requestValueList) {
+                //get message
+                List<RequestValue> requestValueUserList = handleFormRequest.getUserRequestAction().getRequestValues();
+                for (RequestValue requestValue : requestValueUserList) {
                     if (requestValue.getKey().equals("text")) {
                         tvReason.setText(requestValue.getValue());
                     }
                 }
+
+                //get comment
+                List<StaffRequestAction> staffRequestActionList = handleFormRequest.getStaffRequestActions();
+                for (StaffRequestAction staffRequestAction : staffRequestActionList) {
+                    List<RequestValue> requestValueStaffList = staffRequestAction.getRequestValues();
+                    for (RequestValue requestValue : requestValueStaffList) {
+                        commentList.add(new Comment(requestValue.getValue(), staffRequestAction.getName()));
+                    }
+                }
+                getListComment();
+
+
+                //get file path
+                List<RequestFile> requestFileList = handleFormRequest.getUserRequestAction().getRequestFiles();
+                for (RequestFile requestFile : requestFileList) {
+                    fileNameList.add(requestFile.getPath());
+                }
+
+                initFileNameListView();
+
+                //get dynamic button
                 for (final Connection connection : connectionList) {
                     Button btn = new Button(getContext());
                     btn.setText(connection.getConnectionTypeName());
                     btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Toasty.success(getContext(), connection.getNextStepID(), Toasty.LENGTH_SHORT).show();
+                            handleRequest(handleFormRequest.getRequest().getId(), connection.getNextStepID(), 2);
                         }
                     });
                     lnButton.addView(btn);
@@ -178,40 +217,34 @@ public class HandleRequestFragment extends Fragment {
         });
     }
 
-    private void getAccountByUserID(String ID) {
+    private void handleRequest(String requestID, String nextStepID, int status) {
+        List<ActionValue> actionValueList = new ArrayList<>();
+        for (int i = 0; i < stringCommentList.size(); i++) {
+            actionValueList.add(new ActionValue("comment " + i, stringCommentList.get(i)));
+        }
+
+        RequestApprove requestApprove = new RequestApprove();
+        requestApprove.setRequestID(requestID);
+        requestApprove.setNextStepID(nextStepID);
+        requestApprove.setStatus(status);
+        requestApprove.setActionValues(actionValueList);
+
+        final KProgressHUD progressHUD = KProgressHUDManager.showProgressBar(getContext());
         capstoneRepository = new CapstoneRepositoryImpl();
-        capstoneRepository.getAccountByUserID(ID, new CallBackData<List<Profile>>() {
+        capstoneRepository.approveRequest(token, requestApprove, new CallBackData<String>() {
             @Override
-            public void onSuccess(List<Profile> profiles) {
-                initiatorFullName = profiles.get(0).getFullName();
+            public void onSuccess(String s) {
+                FragmentUtils.back(getActivity());
+                progressHUD.dismiss();
+                Toasty.success(getContext(), R.string.request_sent, Toasty.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFail(String message) {
-
+                progressHUD.dismiss();
+                Toasty.error(getContext(), message, Toasty.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            // pre-condition
-            return;
-        }
-
-        int totalHeight = 0;
-        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.AT_MOST);
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
     }
 
 }

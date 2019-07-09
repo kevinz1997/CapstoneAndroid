@@ -11,27 +11,35 @@ public class Profile implements Serializable {
     @SerializedName("id")
     @Expose
     private String id;
+
     @SerializedName("email")
     @Expose
     private String email;
+
     @SerializedName("fullName")
     @Expose
     private String fullName;
+
     @SerializedName("dateOfBirth")
     @Expose
     private String dateOfBirth;
+
     @SerializedName("managerID")
     @Expose
     private String managerID;
+
     @SerializedName("managerName")
     @Expose
     private Object managerName;
+
     @SerializedName("roles")
     @Expose
-    private List<Role> roles = null;
+    private List<Role> roles;
+
     @SerializedName("groups")
     @Expose
-    private List<Group> groups = null;
+    private List<Group> groups;
+
     @SerializedName("isDeleted")
     @Expose
     private Boolean isDeleted;

@@ -47,6 +47,7 @@ import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
 import workflow.capstone.capstoneproject.utils.CallBackData;
 import workflow.capstone.capstoneproject.utils.ConstantDataManager;
 import workflow.capstone.capstoneproject.utils.DynamicWorkflowSharedPreferences;
+import workflow.capstone.capstoneproject.utils.DynamicWorkflowUtils;
 import workflow.capstone.capstoneproject.utils.FragmentUtils;
 import workflow.capstone.capstoneproject.utils.GetRealPathFromURI;
 import workflow.capstone.capstoneproject.utils.KProgressHUDManager;
@@ -260,13 +261,12 @@ public class SendRequestFragment extends Fragment {
         listFileNameAdapter = new ListFileNameAdapter(getContext(), listName);
         listView.setAdapter(listFileNameAdapter);
         listView.setVisibility(View.VISIBLE);
+        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listView);
     }
 
     private void sendRequest(String workFlowTemplateID, String nextStepID) {
         if (token != null) {
-            ActionValue actionValue = new ActionValue();
-            actionValue.setKey("text");
-            actionValue.setValue(edtReason.getText().toString());
+            ActionValue actionValue = new ActionValue("text", edtReason.getText().toString());
 
             List<ActionValue> actionValues = new ArrayList<>();
             actionValues.add(actionValue);
@@ -279,19 +279,19 @@ public class SendRequestFragment extends Fragment {
             request.setActionValues(actionValues);
             request.setImagePaths(listPath);
 
-            final KProgressHUD khub = KProgressHUDManager.showProgressBar(getContext());
+            final KProgressHUD progressHUD = KProgressHUDManager.showProgressBar(getContext());
             capstoneRepository = new CapstoneRepositoryImpl();
             capstoneRepository.postRequest(token, request, new CallBackData<String>() {
                 @Override
                 public void onSuccess(String s) {
                     FragmentUtils.back(getActivity());
-                    khub.dismiss();
-                    Toasty.success(getContext(), R.string.request_sent, Toast.LENGTH_SHORT).show();
+                    progressHUD.dismiss();
+                    Toasty.success(getContext(), R.string.request_sent, Toasty.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onFail(String message) {
-                    khub.dismiss();
+                    progressHUD.dismiss();
                     Toasty.error(getContext(), message, Toasty.LENGTH_SHORT).show();
                 }
             });

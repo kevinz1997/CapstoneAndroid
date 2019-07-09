@@ -5,25 +5,24 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import workflow.capstone.capstoneproject.entities.ActionType;
-import workflow.capstone.capstoneproject.entities.Connection;
-import workflow.capstone.capstoneproject.entities.Request;
-import workflow.capstone.capstoneproject.entities.StaffRequestAction;
-import workflow.capstone.capstoneproject.entities.UserRequestAction;
-
 public class HandleFormRequest {
+
     @SerializedName("request")
     @Expose
     private Request request;
+
     @SerializedName("userRequestAction")
     @Expose
     private UserRequestAction userRequestAction;
+
     @SerializedName("staffRequestActions")
     @Expose
-    private List<StaffRequestAction> staffRequestActions = null;
+    private List<StaffRequestAction> staffRequestActions;
+
     @SerializedName("connections")
     @Expose
-    private List<Connection> connections = null;
+    private List<Connection> connections;
+
     @SerializedName("actionType")
     @Expose
     private ActionType actionType;

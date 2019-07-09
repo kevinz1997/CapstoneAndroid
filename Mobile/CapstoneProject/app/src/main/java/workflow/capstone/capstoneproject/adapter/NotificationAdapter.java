@@ -8,6 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import workflow.capstone.capstoneproject.R;
@@ -19,6 +22,7 @@ public class NotificationAdapter extends BaseAdapter {
     private List<UserNotification> listData;
     private LayoutInflater layoutInflater;
     private Context mContext;
+    private String createDate;
 
     public NotificationAdapter(List<UserNotification> listData, Context mContext) {
         this.listData = listData;
@@ -48,6 +52,7 @@ public class NotificationAdapter extends BaseAdapter {
             convertView = layoutInflater.inflate(R.layout.notification_listview, null);
             holder = new ViewHolder();
             holder.tvMessage = convertView.findViewById(R.id.tv_message);
+            holder.tvCreateDate = convertView.findViewById(R.id.tv_create_date);
             holder.imgIsHandled = convertView.findViewById(R.id.img_is_handled);
             holder.lineView = convertView.findViewById(R.id.line_view);
             convertView.setTag(holder);
@@ -56,6 +61,14 @@ public class NotificationAdapter extends BaseAdapter {
         }
         UserNotification userNotification = this.listData.get(position);
         holder.tvMessage.setText(userNotification.getMessage() + " from " + userNotification.getActorName());
+
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(userNotification.getCreateDate());
+            createDate = new SimpleDateFormat(" HH:mm:ss dd/MM/yyyy").format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        holder.tvCreateDate.setText(createDate);
 
         if (userNotification.getIsHandled()) {
             holder.imgIsHandled.setVisibility(View.VISIBLE);
@@ -72,6 +85,7 @@ public class NotificationAdapter extends BaseAdapter {
 
     private class ViewHolder {
         TextView tvMessage;
+        TextView tvCreateDate;
         ImageView imgIsHandled;
         View lineView;
     }

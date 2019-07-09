@@ -8,10 +8,11 @@ public class UserRequestAction {
 
     @SerializedName("requestFiles")
     @Expose
-    private List<RequestFile> requestFiles = null;
+    private List<RequestFile> requestFiles;
+
     @SerializedName("requestValues")
     @Expose
-    private List<RequestValue> requestValues = null;
+    private List<RequestValue> requestValues;
 
     public List<RequestFile> getRequestFiles() {
         return requestFiles;
