@@ -1,10 +1,9 @@
 package workflow.capstone.capstoneproject.entities;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class StaffRequestAction {
+public class StaffResult {
 
     @SerializedName("fullName")
     @Expose
@@ -21,10 +20,6 @@ public class StaffRequestAction {
     @SerializedName("status")
     @Expose
     private String status;
-
-    @SerializedName("requestValues")
-    @Expose
-    private List<RequestValue> requestValues;
 
     public String getFullName() {
         return fullName;
@@ -56,14 +51,6 @@ public class StaffRequestAction {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public List<RequestValue> getRequestValues() {
-        return requestValues;
-    }
-
-    public void setRequestValues(List<RequestValue> requestValues) {
-        this.requestValues = requestValues;
     }
 
 }

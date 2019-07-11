@@ -13,7 +13,6 @@ import android.widget.ListView;
 
 import java.util.List;
 
-import es.dmoral.toasty.Toasty;
 import workflow.capstone.capstoneproject.R;
 import workflow.capstone.capstoneproject.adapter.NotificationAdapter;
 import workflow.capstone.capstoneproject.entities.UserNotification;
@@ -22,7 +21,6 @@ import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
 import workflow.capstone.capstoneproject.utils.CallBackData;
 import workflow.capstone.capstoneproject.utils.ConstantDataManager;
 import workflow.capstone.capstoneproject.utils.DynamicWorkflowSharedPreferences;
-import workflow.capstone.capstoneproject.utils.FragmentUtils;
 
 public class NotificationFragment extends Fragment {
 
@@ -50,7 +48,21 @@ public class NotificationFragment extends Fragment {
     private void loadNotifications() {
         String token = DynamicWorkflowSharedPreferences.getStoreJWT(getActivity(), ConstantDataManager.AUTHORIZATION_TOKEN);
         capstoneRepository = new CapstoneRepositoryImpl();
-        capstoneRepository.getNotification(token, new CallBackData<List<UserNotification>>() {
+//        capstoneRepository.getNotification(token, new CallBackData<List<UserNotification>>() {
+//            @Override
+//            public void onSuccess(List<UserNotification> userNotifications) {
+//                notificationList = userNotifications;
+//                notificationAdapter = new NotificationAdapter(notificationList, getContext());
+//                listView.setAdapter(notificationAdapter);
+//                onItemClick(listView);
+//            }
+//
+//            @Override
+//            public void onFail(String message) {
+//
+//            }
+//        });
+        capstoneRepository.getNotificationByType(token, 2, new CallBackData<List<UserNotification>>() {
             @Override
             public void onSuccess(List<UserNotification> userNotifications) {
                 notificationList = userNotifications;

@@ -6,13 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
 import workflow.capstone.capstoneproject.entities.DynamicButton;
-import workflow.capstone.capstoneproject.entities.HandleFormRequest;
+import workflow.capstone.capstoneproject.entities.FormRequest;
 import workflow.capstone.capstoneproject.entities.Login;
 import workflow.capstone.capstoneproject.entities.Profile;
+import workflow.capstone.capstoneproject.entities.RequestResult;
 import workflow.capstone.capstoneproject.entities.UserNotification;
 import workflow.capstone.capstoneproject.entities.WorkflowTemplate;
 import workflow.capstone.capstoneproject.utils.CallBackData;
@@ -38,17 +40,23 @@ public interface CapstoneRepository {
 
     void getNotification(String token, CallBackData<List<UserNotification>> callBackData);
 
+    void getNotificationByType(String token, int notificationType, CallBackData<List<UserNotification>> callBackData);
+
     void postRequest(String token, Request request, CallBackData<String> callBackData);
 
     void postRequestFile(String token, MultipartBody.Part file, CallBackData<String[]> callBackData);
 
     void postMultipleRequestFile(String token, MultipartBody.Part[] files, CallBackData<String[]> callBackData);
 
+    void getRequestResult(String token, String requestActionID, CallBackData<RequestResult> callBackData);
+
     void getRequestForm(String token, String workflowTemplateID, CallBackData<DynamicButton> callBackData);
 
-    void getRequestHandleForm(String token, String requestActionID, CallBackData<HandleFormRequest> callBackData);
+    void getRequestHandleForm(String token, String requestActionID, CallBackData<FormRequest> callBackData);
 
     void getAccountByUserID(String ID, CallBackData<List<Profile>> callBackData);
 
     void approveRequest(String token, RequestApprove requestApprove, CallBackData<String> callBackData);
+
+    void downloadFileWithDynamicUrlSync(String fileUrl, CallBackData<ResponseBody> callBackData);
 }

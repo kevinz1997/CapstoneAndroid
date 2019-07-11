@@ -1,7 +1,7 @@
 package workflow.capstone.capstoneproject.retrofit;
 
 public class ConfigApi {
-    public static final String BASE_URL = "http://192.168.1.141:1234/api/";
+    public static final String BASE_URL = "http://10.0.2.2:159/api/";
 
     public interface Api {
         String LOGIN = "Token/User";
@@ -14,8 +14,10 @@ public class ConfigApi {
         String GET_WORKFLOW = "WorkflowsTemplates/GetUserWorkflow";
         String GET_NUMBER_NOTIFICATION = "UserNotifications/GetNumberOfNotification";
         String GET_NOTIFICATION = "UserNotifications/GetNotificationByUserId";
+        String GET_NOTIFICATION_BY_TYPE = "UserNotifications/GetNotificationByUserId";
         String POST_REQUEST = "Requests";
         String POST_REQUEST_FILE = "RequestFiles";
+        String GET_REQUEST_RESULT = "Requests/GetRequestResult";
         String GET_REQUEST_FORM = "Requests/GetRequestForm";
         String GET_REQUEST_HANDLE_FORM = "Requests/GetRequestHandleForm";
         String APPROVE_REQUEST = "Requests/ApproveRequest";
