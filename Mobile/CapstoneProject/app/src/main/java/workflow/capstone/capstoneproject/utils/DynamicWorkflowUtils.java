@@ -10,6 +10,8 @@ import android.widget.ListView;
 
 public class DynamicWorkflowUtils {
 
+    private static final String[] okFileExtensions =  new String[] {"jpg", "png", "gif","jpeg"};
+
     public static boolean isConnectingToInternet(Context context) {
         ConnectivityManager connectivity = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -45,5 +47,21 @@ public class DynamicWorkflowUtils {
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
+    }
+
+    public static boolean accept(String imageExtension)
+    {
+        for (String extension : okFileExtensions)
+        {
+            if (imageExtension.toLowerCase().equals(extension))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String mapNameWithUserName(String fullName, String userName) {
+        return fullName + " ( " + userName + " ) ";
     }
 }

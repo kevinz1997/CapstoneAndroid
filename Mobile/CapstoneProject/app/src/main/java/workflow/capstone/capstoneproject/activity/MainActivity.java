@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initTabLayout();
         KeyboardVisibilityEvent.setEventListener(this,
                 new KeyboardVisibilityEventListener() {
                     @Override
@@ -57,8 +56,10 @@ public class MainActivity extends AppCompatActivity {
                         tabLayout.setVisibility(isOpen ? View.GONE : View.VISIBLE);
                     }
                 });
+
         token = DynamicWorkflowSharedPreferences.getStoreJWT(context, ConstantDataManager.AUTHORIZATION_TOKEN);
 
+        initTabLayout();
         capstoneRepository = new CapstoneRepositoryImpl();
         capstoneRepository.getProfile(token, new CallBackData<List<Profile>>() {
             @Override

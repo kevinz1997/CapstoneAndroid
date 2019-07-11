@@ -59,7 +59,6 @@ public class SendRequestFragment extends Fragment {
     private ImageView imgUploadFile;
     private ImageView imgUploadImage;
     private EditText edtReason;
-    private Button btnSend;
     private TextView tvNameOfWorkFlow;
     private TextView tvAttachment;
     private ListView listView;
@@ -109,13 +108,6 @@ public class SendRequestFragment extends Fragment {
                 readStoragePermissionGranted();
             }
         });
-
-//        btnSend.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                sendRequest(bundle.getString("workFlowTemplateID"));
-//            }
-//        });
 
         tvNameOfWorkFlow.setText(bundle.getString("nameOfWorkflow"));
         return view;
@@ -180,7 +172,6 @@ public class SendRequestFragment extends Fragment {
         lnButton = view.findViewById(R.id.ln_button);
         imgBack = view.findViewById(R.id.img_Back);
         edtReason = view.findViewById(R.id.edt_Reason);
-//        btnSend = view.findViewById(R.id.btn_Send);
         tvNameOfWorkFlow = view.findViewById(R.id.tv_name_of_workflow);
         imgUploadFile = view.findViewById(R.id.img_upload_file);
         imgUploadImage = view.findViewById(R.id.img_upload_image);

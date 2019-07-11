@@ -5,7 +5,15 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class HandleFormRequest {
+public class FormRequest {
+
+    @SerializedName("initiatorName")
+    @Expose
+    private String initiatorName;
+
+    @SerializedName("workFlowTemplateName")
+    @Expose
+    private String workFlowTemplateName;
 
     @SerializedName("request")
     @Expose
@@ -26,6 +34,22 @@ public class HandleFormRequest {
     @SerializedName("actionType")
     @Expose
     private ActionType actionType;
+
+    public String getInitiatorName() {
+        return initiatorName;
+    }
+
+    public void setInitiatorName(String initiatorName) {
+        this.initiatorName = initiatorName;
+    }
+
+    public String getWorkFlowTemplateName() {
+        return workFlowTemplateName;
+    }
+
+    public void setWorkFlowTemplateName(String workFlowTemplateName) {
+        this.workFlowTemplateName = workFlowTemplateName;
+    }
 
     public Request getRequest() {
         return request;

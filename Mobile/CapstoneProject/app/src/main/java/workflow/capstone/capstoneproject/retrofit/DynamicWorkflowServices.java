@@ -13,6 +13,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Query;
+import retrofit2.http.Url;
 import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
@@ -53,6 +54,9 @@ public interface DynamicWorkflowServices {
     @GET(ConfigApi.Api.GET_NOTIFICATION)
     Call<ResponseBody> getNotification();
 
+    @GET(ConfigApi.Api.GET_NOTIFICATION_BY_TYPE)
+    Call<ResponseBody> getNotificationByType(@Query(value = "notificationType", encoded = true) int notificationType);
+
     @Headers({"Content-Type:application/json"})
     @POST(ConfigApi.Api.POST_REQUEST)
     Call<ResponseBody> postRequest(@Body Request request);
@@ -69,6 +73,9 @@ public interface DynamicWorkflowServices {
             @Part MultipartBody.Part[] files
     );
 
+    @GET(ConfigApi.Api.GET_REQUEST_RESULT)
+    Call<ResponseBody> getRequestResult(@Query(value = "requestActionID", encoded = true) String requestActionID);
+
     @GET(ConfigApi.Api.GET_REQUEST_FORM)
     Call<ResponseBody> getRequestForm(@Query(value = "workFlowTemplateID", encoded = true) String workFlowTemplateID);
 
@@ -81,5 +88,8 @@ public interface DynamicWorkflowServices {
     @Headers({"Content-Type:application/json"})
     @POST(ConfigApi.Api.APPROVE_REQUEST)
     Call<ResponseBody> approveRequest(@Body RequestApprove requestApprove);
+
+    @GET
+    Call<ResponseBody> downloadFileWithDynamicUrlSync(@Url String fileUrl);
 
 }

@@ -90,4 +90,5 @@ public class UserNotification implements Serializable {
     public void setIsHandled(Boolean isHandled) {
         this.isHandled = isHandled;
     }
+
 }

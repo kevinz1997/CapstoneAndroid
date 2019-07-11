@@ -48,7 +48,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/dp10"
                     android:layout_weight="7"
-                    android:text="Subject"
+                    android:text="Workflow Name"
                     android:textColor="@color/colorAccent"
                     android:textSize="@dimen/sp15" />
 

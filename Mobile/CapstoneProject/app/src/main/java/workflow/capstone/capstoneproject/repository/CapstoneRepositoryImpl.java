@@ -22,9 +22,10 @@ import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
 import workflow.capstone.capstoneproject.entities.DynamicButton;
-import workflow.capstone.capstoneproject.entities.HandleFormRequest;
+import workflow.capstone.capstoneproject.entities.FormRequest;
 import workflow.capstone.capstoneproject.entities.Login;
 import workflow.capstone.capstoneproject.entities.Profile;
+import workflow.capstone.capstoneproject.entities.RequestResult;
 import workflow.capstone.capstoneproject.entities.UserNotification;
 import workflow.capstone.capstoneproject.entities.WorkflowTemplate;
 import workflow.capstone.capstoneproject.retrofit.ClientApi;
@@ -366,6 +367,44 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     }
 
     @Override
+    public void getNotificationByType(String token, int notificationType, final CallBackData<List<UserNotification>> callBackData) {
+        Call<ResponseBody> serviceCall = clientApi.getDWServices(token).getNotificationByType(notificationType);
+        Log.e("URL=", clientApi.getDWServices(token).getNotificationByType(notificationType).request().url().toString());
+        serviceCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    if (response.code() == 200) {
+                        try {
+                            String result = response.body().string();
+                            Type type = new TypeToken<List<UserNotification>>() {
+                            }.getType();
+                            List<UserNotification> responseResult = new Gson().fromJson(result, type);
+                            if (responseResult == null) {
+                                callBackData.onFail(response.message());
+                            }
+                            callBackData.onSuccess(responseResult);
+                        } catch (JsonSyntaxException jsonError) {
+                            jsonError.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        callBackData.onFail(response.message());
+                    }
+                } else if (response.code() == 400) {
+                    callBackData.onFail(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callBackData.onFail(call.toString());
+            }
+        });
+    }
+
+    @Override
     public void postRequest(String token, Request request, final CallBackData<String> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDWServices(token).postRequest(request);
         Log.e("URL=", clientApi.getDWServices(token).postRequest(request).request().url().toString());
@@ -480,6 +519,44 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     }
 
     @Override
+    public void getRequestResult(String token, String requestActionID, final CallBackData<RequestResult> callBackData) {
+        Call<ResponseBody> serviceCall = clientApi.getDWServices(token).getRequestResult(requestActionID);
+        Log.e("URL=", clientApi.getDWServices(token).getRequestResult(requestActionID).request().url().toString());
+        serviceCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    if (response.code() == 200) {
+                        try {
+                            String result = response.body().string();
+                            Type type = new TypeToken<RequestResult>() {
+                            }.getType();
+                            RequestResult responseResult = new Gson().fromJson(result, type);
+                            if (responseResult == null) {
+                                callBackData.onFail(response.message());
+                            }
+                            callBackData.onSuccess(responseResult);
+                        } catch (JsonSyntaxException jsonError) {
+                            jsonError.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        callBackData.onFail(response.message());
+                    }
+                } else if (response.code() == 400) {
+                    callBackData.onFail(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callBackData.onFail(call.toString());
+            }
+        });
+    }
+
+    @Override
     public void getRequestForm(String token, String workflowTemplateID, final CallBackData<DynamicButton> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDWServices(token).getRequestForm(workflowTemplateID);
         Log.e("URL=", clientApi.getDWServices(token).getRequestForm(workflowTemplateID).request().url().toString());
@@ -518,7 +595,7 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     }
 
     @Override
-    public void getRequestHandleForm(String token, String requestActionID, final CallBackData<HandleFormRequest> callBackData) {
+    public void getRequestHandleForm(String token, String requestActionID, final CallBackData<FormRequest> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDWServices(token).getRequestHandleForm(requestActionID);
         Log.e("URL=", clientApi.getDWServices(token).getRequestHandleForm(requestActionID).request().url().toString());
         serviceCall.enqueue(new Callback<ResponseBody>() {
@@ -528,9 +605,9 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
                     if (response.code() == 200) {
                         try {
                             String result = response.body().string();
-                            Type type = new TypeToken<HandleFormRequest>() {
+                            Type type = new TypeToken<FormRequest>() {
                             }.getType();
-                            HandleFormRequest responseResult = new Gson().fromJson(result, type);
+                            FormRequest responseResult = new Gson().fromJson(result, type);
                             if (responseResult == null) {
                                 callBackData.onFail(response.message());
                             }
@@ -615,6 +692,35 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
                             jsonError.printStackTrace();
                         } catch (IOException e) {
                             e.printStackTrace();
+                        }
+                    } else {
+                        callBackData.onFail(response.message());
+                    }
+                } else if (response.code() == 400) {
+                    callBackData.onFail(response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                callBackData.onFail(call.toString());
+            }
+        });
+    }
+
+    @Override
+    public void downloadFileWithDynamicUrlSync(String fileUrl, final CallBackData<ResponseBody> callBackData) {
+        Call<ResponseBody> serviceCall = clientApi.getDynamicWorkflowServices().downloadFileWithDynamicUrlSync(fileUrl);
+        Log.e("URL=", clientApi.getDynamicWorkflowServices().downloadFileWithDynamicUrlSync(fileUrl).request().url().toString());
+        serviceCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response != null && response.body() != null) {
+                    if (response.code() == 200) {
+                        try {
+                            callBackData.onSuccess(response.body());
+                        } catch (JsonSyntaxException jsonError) {
+                            jsonError.printStackTrace();
                         }
                     } else {
                         callBackData.onFail(response.message());
