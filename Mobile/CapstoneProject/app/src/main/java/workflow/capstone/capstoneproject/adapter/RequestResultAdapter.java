@@ -63,7 +63,7 @@ public class RequestResultAdapter extends BaseAdapter {
         String createDate = "";
         try {
             Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(staffResult.getCreateDate());
-            createDate = new SimpleDateFormat("HH:mm:ss\ndd-MM-yyyy").format(date);
+            createDate = new SimpleDateFormat("MMM dd yyyy' at 'hh:mm a").format(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }

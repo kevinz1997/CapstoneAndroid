@@ -1,7 +1,13 @@
 package workflow.capstone.capstoneproject.fragment;
 
 
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -37,7 +43,7 @@ import workflow.capstone.capstoneproject.api.ActionValue;
 import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.entities.Comment;
 import workflow.capstone.capstoneproject.entities.Connection;
-import workflow.capstone.capstoneproject.entities.FormRequest;
+import workflow.capstone.capstoneproject.entities.HandleRequestForm;
 import workflow.capstone.capstoneproject.entities.Profile;
 import workflow.capstone.capstoneproject.entities.RequestFile;
 import workflow.capstone.capstoneproject.entities.RequestValue;
@@ -73,6 +79,8 @@ public class HandleRequestFragment extends Fragment {
     private TextView tvInitiatorName;
     private TextView tvWorkFlowName;
     private TextView tvReason;
+    private DownloadManager downloadManager;
+    private String requestActionID;
 
     public HandleRequestFragment() {
         // Required empty public constructor
@@ -96,7 +104,8 @@ public class HandleRequestFragment extends Fragment {
         token = DynamicWorkflowSharedPreferences.getStoreJWT(getContext(), ConstantDataManager.AUTHORIZATION_TOKEN);
 
         final Bundle bundle = getArguments();
-        getHandleForm(bundle.getString("requestActionID"));
+        requestActionID = bundle.getString("requestActionID");
+        getHandleForm(requestActionID);
 
         imgSendComment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,20 +138,24 @@ public class HandleRequestFragment extends Fragment {
         Comment comment = new Comment(stringComment, fullName);
         edtComment.setText("");
         commentList.add(comment);
-        commentAdapter = new CommentAdapter(commentList, getContext());
-        commentAdapter.notifyDataSetChanged();
-        listViewComment.setAdapter(commentAdapter);
-        listViewComment.setVisibility(View.VISIBLE);
-        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewComment);
-        setListViewCommentOnLongClick(listViewComment);
+        if (getActivity() != null) {
+            commentAdapter = new CommentAdapter(commentList, getActivity());
+            commentAdapter.notifyDataSetChanged();
+            listViewComment.setAdapter(commentAdapter);
+            listViewComment.setVisibility(View.VISIBLE);
+            DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewComment);
+            setListViewCommentOnLongClick(listViewComment);
+        }
     }
 
     private void getListComment() {
-        commentAdapter = new CommentAdapter(commentList, getContext());
-        commentAdapter.notifyDataSetChanged();
-        listViewComment.setAdapter(commentAdapter);
-        listViewComment.setVisibility(View.VISIBLE);
-        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewComment);
+        if (getActivity() != null) {
+            commentAdapter = new CommentAdapter(commentList, getActivity());
+            commentAdapter.notifyDataSetChanged();
+            listViewComment.setAdapter(commentAdapter);
+            listViewComment.setVisibility(View.VISIBLE);
+            DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewComment);
+        }
     }
 
     private void setListViewCommentOnLongClick(ListView listView) {
@@ -156,10 +169,12 @@ public class HandleRequestFragment extends Fragment {
     }
 
     private void initFileNameListView() {
-        handleFileNameAdapter = new HandleFileNameAdapter(getContext(), fileNameList);
-        listViewFileName.setAdapter(handleFileNameAdapter);
-        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewFileName);
-        setOnClickListViewFileName(listViewFileName);
+        if (getActivity() != null) {
+            handleFileNameAdapter = new HandleFileNameAdapter(getActivity(), fileNameList);
+            listViewFileName.setAdapter(handleFileNameAdapter);
+            DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listViewFileName);
+            setOnClickListViewFileName(listViewFileName);
+        }
     }
 
     private void setOnClickListViewFileName(final ListView listView) {
@@ -167,7 +182,7 @@ public class HandleRequestFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final String fileNameUrl = fileUrl.get(position);
-                String imageName = fileNameList.get(position);
+                final String imageName = fileNameList.get(position);
                 String imageExtension = fileNameUrl.substring(fileNameUrl.lastIndexOf(".") + 1);
                 boolean checkIsImage = DynamicWorkflowUtils.accept(imageExtension);
 
@@ -188,14 +203,14 @@ public class HandleRequestFragment extends Fragment {
                     dialog.setOnShowListener(new DialogInterface.OnShowListener() {
                         @Override
                         public void onShow(DialogInterface d) {
-                            ImageView image =  dialog.findViewById(R.id.imageDialog);
+                            ImageView image = dialog.findViewById(R.id.imageDialog);
 
                             Picasso.get()
                                     .load(fileNameUrl)
                                     .into(image);
 //                            image.setBackground(getResources().getDrawable(R.drawable.ic_notification_grey));
 
-                            float imageWidthInPX = (float)image.getWidth();
+                            float imageWidthInPX = (float) image.getWidth();
 
                             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
                             image.setLayoutParams(layoutParams);
@@ -205,27 +220,60 @@ public class HandleRequestFragment extends Fragment {
                     });
                     dialog.show();
                 } else {
-                    downloadFile(fileNameUrl, imageName);
+//                    downloadFile(fileNameUrl, imageName);
+                    new AlertDialog.Builder(getContext())
+                            .setTitle("Download file.")
+                            .setMessage("Are you sure you want to download this file?")
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+//                                    downloadFile(fileNameUrl, imageName);
+                                    downloadFileWithDownloadManager(fileNameUrl);
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .setCancelable(false)
+                            .show();
                 }
             }
         });
     }
 
+    private void downloadFileWithDownloadManager(String fileNameUrl) {
+        downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(fileNameUrl);
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        downloadManager.enqueue(request);
+
+        BroadcastReceiver onComplete = new BroadcastReceiver() {
+            public void onReceive(Context ctxt, Intent intent) {
+                Toasty.success(ctxt, "Download file successful!", Toasty.LENGTH_LONG).show();
+            }
+        };
+        getContext().registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
     private void getHandleForm(String requestActionID) {
         capstoneRepository = new CapstoneRepositoryImpl();
-        capstoneRepository.getRequestHandleForm(token, requestActionID, new CallBackData<FormRequest>() {
+        capstoneRepository.getRequestHandleForm(token, requestActionID, new CallBackData<HandleRequestForm>() {
             @Override
-            public void onSuccess(final FormRequest formRequest) {
-                final List<Connection> connectionList = formRequest.getConnections();
+            public void onSuccess(final HandleRequestForm handleRequestForm) {
+                final List<Connection> connectionList = handleRequestForm.getConnections();
 
                 //set InitiatorName
-                tvInitiatorName.setText(formRequest.getInitiatorName());
+                tvInitiatorName.setText(handleRequestForm.getInitiatorName());
 
                 //set Workflow Name
-                tvWorkFlowName.setText(formRequest.getWorkFlowTemplateName());
+                tvWorkFlowName.setText(handleRequestForm.getWorkFlowTemplateName());
 
                 //get message
-                List<RequestValue> requestValueUserList = formRequest.getUserRequestAction().getRequestValues();
+                List<RequestValue> requestValueUserList = handleRequestForm.getUserRequestAction().getRequestValues();
                 for (RequestValue requestValue : requestValueUserList) {
                     if (requestValue.getKey().equals("text")) {
                         tvReason.setText(requestValue.getValue());
@@ -233,7 +281,7 @@ public class HandleRequestFragment extends Fragment {
                 }
 
                 //get comment
-                List<StaffRequestAction> staffRequestActionList = formRequest.getStaffRequestActions();
+                List<StaffRequestAction> staffRequestActionList = handleRequestForm.getStaffRequestActions();
                 for (StaffRequestAction staffRequestAction : staffRequestActionList) {
                     List<RequestValue> requestValueStaffList = staffRequestAction.getRequestValues();
                     for (RequestValue requestValue : requestValueStaffList) {
@@ -244,7 +292,7 @@ public class HandleRequestFragment extends Fragment {
 
 
                 //get file path
-                List<RequestFile> requestFileList = formRequest.getUserRequestAction().getRequestFiles();
+                List<RequestFile> requestFileList = handleRequestForm.getUserRequestAction().getRequestFiles();
                 for (RequestFile requestFile : requestFileList) {
                     String fileName = requestFile.getPath().substring(requestFile.getPath().lastIndexOf("\\") + 1);
                     fileNameList.add(fileName);
@@ -260,7 +308,7 @@ public class HandleRequestFragment extends Fragment {
                     btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            handleRequest(formRequest.getRequest().getId(), connection.getNextStepID(), 2);
+                            handleRequest(handleRequestForm.getRequest().getId(), connection.getNextStepID(), 2);
                         }
                     });
                     lnButton.addView(btn);
@@ -282,6 +330,7 @@ public class HandleRequestFragment extends Fragment {
 
         RequestApprove requestApprove = new RequestApprove();
         requestApprove.setRequestID(requestID);
+        requestApprove.setRequestActionID(requestActionID);
         requestApprove.setNextStepID(nextStepID);
         requestApprove.setStatus(status);
         requestApprove.setActionValues(actionValueList);
@@ -326,8 +375,10 @@ public class HandleRequestFragment extends Fragment {
 
     private boolean writeResponseBodyToDisk(ResponseBody body, String name) {
         try {
+            //Get path of the SDCard
             File root = android.os.Environment.getExternalStorageDirectory();
-            File dir = new File (root.getAbsolutePath() + "/download");
+            //Get full path of download folder
+            File dir = new File(root.getAbsolutePath() + "/download");
             dir.mkdirs();
             File file = new File(dir, name);
 

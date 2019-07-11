@@ -11,6 +11,10 @@ public class RequestApprove {
     @Expose
     private String requestID;
 
+    @SerializedName("requestActionID")
+    @Expose
+    private String requestActionID;
+
     @SerializedName("status")
     @Expose
     private Integer status;
@@ -21,7 +25,7 @@ public class RequestApprove {
 
     @SerializedName("actionValues")
     @Expose
-    private List<ActionValue> actionValues;
+    private List<ActionValue> actionValues = null;
 
     public String getRequestID() {
         return requestID;
@@ -29,6 +33,14 @@ public class RequestApprove {
 
     public void setRequestID(String requestID) {
         this.requestID = requestID;
+    }
+
+    public String getRequestActionID() {
+        return requestActionID;
+    }
+
+    public void setRequestActionID(String requestActionID) {
+        this.requestActionID = requestActionID;
     }
 
     public Integer getStatus() {

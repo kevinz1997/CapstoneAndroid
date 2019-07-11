@@ -87,9 +87,11 @@ public class CompleteRequestFragment extends Fragment {
     }
 
     private void configListView(ListView listView, List<StaffResult> staffResultList) {
-        requestResultAdapter = new RequestResultAdapter(getContext(), staffResultList);
-        listView.setAdapter(requestResultAdapter);
-        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listView);
+        if (getActivity() != null) {
+            requestResultAdapter = new RequestResultAdapter(getActivity(), staffResultList);
+            listView.setAdapter(requestResultAdapter);
+            DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listView);
+        }
     }
 
 }
