@@ -5,9 +5,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import workflow.capstone.capstoneproject.fragment.NotificationFragment;
+import workflow.capstone.capstoneproject.fragment.ListHandleRequestFragment;
 import workflow.capstone.capstoneproject.fragment.ProfileFragment;
-import workflow.capstone.capstoneproject.fragment.RequestHistoryFragment;
+import workflow.capstone.capstoneproject.fragment.ListCompleteRequestFragment;
 import workflow.capstone.capstoneproject.fragment.WorkflowFragment;
 
 public class TabAdapter extends FragmentPagerAdapter {
@@ -23,9 +23,9 @@ public class TabAdapter extends FragmentPagerAdapter {
         if (position == 0) {
             return new WorkflowFragment();
         } else if (position == 1) {
-            return new RequestHistoryFragment();
+            return new ListCompleteRequestFragment();
         } else if (position == 2) {
-            return new NotificationFragment();
+            return new ListHandleRequestFragment();
         } else {
             return new ProfileFragment();
         }

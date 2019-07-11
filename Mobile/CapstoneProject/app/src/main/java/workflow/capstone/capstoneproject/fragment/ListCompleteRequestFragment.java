@@ -22,53 +22,42 @@ import workflow.capstone.capstoneproject.utils.CallBackData;
 import workflow.capstone.capstoneproject.utils.ConstantDataManager;
 import workflow.capstone.capstoneproject.utils.DynamicWorkflowSharedPreferences;
 
-public class NotificationFragment extends Fragment {
+public class ListCompleteRequestFragment extends Fragment {
 
     private CapstoneRepository capstoneRepository;
     private NotificationAdapter notificationAdapter;
     private List<UserNotification> notificationList;
     private ListView listView;
 
-    public NotificationFragment() {
+    public ListCompleteRequestFragment() {
         // Required empty public constructor
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_notification, container, false);
+        View view = inflater.inflate(R.layout.fragment_list_complete_request, container, false);
 
-        listView = view.findViewById(R.id.list_notification);
+        listView = view.findViewById(R.id.list_request_history);
 
-        loadNotifications();
+        loadCompleteRequest();
         return view;
     }
 
-    private void loadNotifications() {
+    private void loadCompleteRequest() {
         String token = DynamicWorkflowSharedPreferences.getStoreJWT(getActivity(), ConstantDataManager.AUTHORIZATION_TOKEN);
         capstoneRepository = new CapstoneRepositoryImpl();
-//        capstoneRepository.getNotification(token, new CallBackData<List<UserNotification>>() {
-//            @Override
-//            public void onSuccess(List<UserNotification> userNotifications) {
-//                notificationList = userNotifications;
-//                notificationAdapter = new NotificationAdapter(notificationList, getContext());
-//                listView.setAdapter(notificationAdapter);
-//                onItemClick(listView);
-//            }
-//
-//            @Override
-//            public void onFail(String message) {
-//
-//            }
-//        });
-        capstoneRepository.getNotificationByType(token, 2, new CallBackData<List<UserNotification>>() {
+        capstoneRepository.getNotificationByType(token, 3, new CallBackData<List<UserNotification>>() {
             @Override
             public void onSuccess(List<UserNotification> userNotifications) {
                 notificationList = userNotifications;
-                notificationAdapter = new NotificationAdapter(notificationList, getContext());
-                listView.setAdapter(notificationAdapter);
-                onItemClick(listView);
+                if (getActivity() != null) {
+                    notificationAdapter = new NotificationAdapter(notificationList, getActivity());
+                    listView.setAdapter(notificationAdapter);
+                    onItemClick(listView);
+                }
             }
 
             @Override
@@ -82,7 +71,7 @@ public class NotificationFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Fragment fragment = new HandleRequestFragment();
+                Fragment fragment = new CompleteRequestFragment();
                 Bundle bundle = new Bundle();
                 UserNotification userNotification = (UserNotification) adapterView.getItemAtPosition(position);
                 String requestActionID = userNotification.getEventID();
@@ -98,5 +87,4 @@ public class NotificationFragment extends Fragment {
             }
         });
     }
-
 }

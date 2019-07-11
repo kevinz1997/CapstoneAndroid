@@ -18,9 +18,9 @@ import java.util.List;
 
 import workflow.capstone.capstoneproject.R;
 import workflow.capstone.capstoneproject.entities.Profile;
-import workflow.capstone.capstoneproject.fragment.NotificationFragment;
+import workflow.capstone.capstoneproject.fragment.ListHandleRequestFragment;
 import workflow.capstone.capstoneproject.fragment.ProfileFragment;
-import workflow.capstone.capstoneproject.fragment.RequestHistoryFragment;
+import workflow.capstone.capstoneproject.fragment.ListCompleteRequestFragment;
 import workflow.capstone.capstoneproject.fragment.WorkflowFragment;
 import workflow.capstone.capstoneproject.repository.CapstoneRepository;
 import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
@@ -40,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private FragmentTransaction fragmentTransaction;
 
     private WorkflowFragment workflowFragment;
-    private RequestHistoryFragment requestHistoryFragment;
-    private NotificationFragment notificationFragment;
+    private ListCompleteRequestFragment listCompleteRequestFragment;
+    private ListHandleRequestFragment listHandleRequestFragment;
     private ProfileFragment profileFragment;
     private String token;
 
@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
     private void initTabLayout() {
         tabLayout = findViewById(R.id.tab_Layout);
         workflowFragment = new WorkflowFragment();
-        requestHistoryFragment = new RequestHistoryFragment();
-        notificationFragment = new NotificationFragment();
+        listCompleteRequestFragment = new ListCompleteRequestFragment();
+        listHandleRequestFragment = new ListHandleRequestFragment();
         profileFragment = new ProfileFragment();
         for (int i = 0; i < 4; i++) {
             tabLayout.addTab(tabLayout.newTab());
@@ -176,12 +176,12 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 1:
                 tabLayout.getTabAt(tabPosition).setIcon(tabIcons[1]);
-                replaceFragment(requestHistoryFragment);
+                replaceFragment(listCompleteRequestFragment);
                 break;
             case 2:
                 imageView.setImageResource(R.drawable.ic_notification_blue);
                 badge.setVisibility(View.INVISIBLE);
-                replaceFragment(notificationFragment);
+                replaceFragment(listHandleRequestFragment);
                 break;
             case 3:
                 tabLayout.getTabAt(tabPosition).setIcon(tabIcons[5]);

@@ -21,8 +21,8 @@ import retrofit2.Response;
 import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
-import workflow.capstone.capstoneproject.entities.DynamicButton;
-import workflow.capstone.capstoneproject.entities.FormRequest;
+import workflow.capstone.capstoneproject.entities.RequestForm;
+import workflow.capstone.capstoneproject.entities.HandleRequestForm;
 import workflow.capstone.capstoneproject.entities.Login;
 import workflow.capstone.capstoneproject.entities.Profile;
 import workflow.capstone.capstoneproject.entities.RequestResult;
@@ -557,7 +557,7 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     }
 
     @Override
-    public void getRequestForm(String token, String workflowTemplateID, final CallBackData<DynamicButton> callBackData) {
+    public void getRequestForm(String token, String workflowTemplateID, final CallBackData<RequestForm> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDWServices(token).getRequestForm(workflowTemplateID);
         Log.e("URL=", clientApi.getDWServices(token).getRequestForm(workflowTemplateID).request().url().toString());
         serviceCall.enqueue(new Callback<ResponseBody>() {
@@ -567,9 +567,9 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
                     if (response.code() == 200) {
                         try {
                             String result = response.body().string();
-                            Type type = new TypeToken<DynamicButton>() {
+                            Type type = new TypeToken<RequestForm>() {
                             }.getType();
-                            DynamicButton responseResult = new Gson().fromJson(result, type);
+                            RequestForm responseResult = new Gson().fromJson(result, type);
                             if (responseResult == null) {
                                 callBackData.onFail(response.message());
                             }
@@ -595,7 +595,7 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
     }
 
     @Override
-    public void getRequestHandleForm(String token, String requestActionID, final CallBackData<FormRequest> callBackData) {
+    public void getRequestHandleForm(String token, String requestActionID, final CallBackData<HandleRequestForm> callBackData) {
         Call<ResponseBody> serviceCall = clientApi.getDWServices(token).getRequestHandleForm(requestActionID);
         Log.e("URL=", clientApi.getDWServices(token).getRequestHandleForm(requestActionID).request().url().toString());
         serviceCall.enqueue(new Callback<ResponseBody>() {
@@ -605,9 +605,9 @@ public class CapstoneRepositoryImpl implements CapstoneRepository {
                     if (response.code() == 200) {
                         try {
                             String result = response.body().string();
-                            Type type = new TypeToken<FormRequest>() {
+                            Type type = new TypeToken<HandleRequestForm>() {
                             }.getType();
-                            FormRequest responseResult = new Gson().fromJson(result, type);
+                            HandleRequestForm responseResult = new Gson().fromJson(result, type);
                             if (responseResult == null) {
                                 callBackData.onFail(response.message());
                             }

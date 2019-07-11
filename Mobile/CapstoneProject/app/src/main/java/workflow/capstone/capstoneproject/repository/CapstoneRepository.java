@@ -10,8 +10,8 @@ import okhttp3.ResponseBody;
 import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.api.RequestApprove;
 import workflow.capstone.capstoneproject.api.UpdateProfileModel;
-import workflow.capstone.capstoneproject.entities.DynamicButton;
-import workflow.capstone.capstoneproject.entities.FormRequest;
+import workflow.capstone.capstoneproject.entities.RequestForm;
+import workflow.capstone.capstoneproject.entities.HandleRequestForm;
 import workflow.capstone.capstoneproject.entities.Login;
 import workflow.capstone.capstoneproject.entities.Profile;
 import workflow.capstone.capstoneproject.entities.RequestResult;
@@ -50,9 +50,9 @@ public interface CapstoneRepository {
 
     void getRequestResult(String token, String requestActionID, CallBackData<RequestResult> callBackData);
 
-    void getRequestForm(String token, String workflowTemplateID, CallBackData<DynamicButton> callBackData);
+    void getRequestForm(String token, String workflowTemplateID, CallBackData<RequestForm> callBackData);
 
-    void getRequestHandleForm(String token, String requestActionID, CallBackData<FormRequest> callBackData);
+    void getRequestHandleForm(String token, String requestActionID, CallBackData<HandleRequestForm> callBackData);
 
     void getAccountByUserID(String ID, CallBackData<List<Profile>> callBackData);
 

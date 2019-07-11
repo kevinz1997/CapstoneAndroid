@@ -68,7 +68,7 @@ public class WorkflowFragment extends Fragment {
             public void onSuccess(List<WorkflowTemplate> workflowTemplates) {
                 listView = view.findViewById(R.id.list_workflow);
                 workflowList = workflowTemplates;
-                if (getActivity()!=null){
+                if (getActivity() != null) {
                     workflowAdapter = new WorkflowAdapter(workflowList, getActivity());
                     listView.setAdapter(workflowAdapter);
                 }
@@ -89,7 +89,8 @@ public class WorkflowFragment extends Fragment {
             @Override
             public void onRefresh() {
                 new Handler().postDelayed(new Runnable() {
-                    @Override public void run() {
+                    @Override
+                    public void run() {
                         swipeRefreshLayout.setRefreshing(false);
                         loadWorkflows(view);
                     }
@@ -134,9 +135,11 @@ public class WorkflowFragment extends Fragment {
     }
 
     private void searchWorkflow(List<WorkflowTemplate> listWorkflow) {
-        workflowAdapter = new WorkflowAdapter(listWorkflow, getContext());
-        listView.setAdapter(workflowAdapter);
-        itemOnClick(listView);
+        if (getActivity() != null) {
+            workflowAdapter = new WorkflowAdapter(listWorkflow, getActivity());
+            listView.setAdapter(workflowAdapter);
+            itemOnClick(listView);
+        }
     }
 
     private void itemOnClick(final ListView listView) {

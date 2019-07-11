@@ -1,6 +1,8 @@
 package workflow.capstone.capstoneproject.adapter;
 
 import android.content.Context;
+import android.support.v4.text.HtmlCompat;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,42 +53,35 @@ public class NotificationAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.notification_listview, null);
             holder = new ViewHolder();
+            holder.tvWorkflowName = convertView.findViewById(R.id.tv_workflow_name);
             holder.tvMessage = convertView.findViewById(R.id.tv_message);
             holder.tvCreateDate = convertView.findViewById(R.id.tv_create_date);
-            holder.imgIsHandled = convertView.findViewById(R.id.img_is_handled);
-            holder.lineView = convertView.findViewById(R.id.line_view);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+
         UserNotification userNotification = this.listData.get(position);
-        holder.tvMessage.setText(userNotification.getMessage() + " from " + userNotification.getActorName());
+
+        holder.tvWorkflowName.setText(userNotification.getWorkflowName());
+
+        String message = userNotification.getMessage().contains("completed") ? userNotification.getMessage() : userNotification.getMessage() + " from " + "<b>" + userNotification.getActorName() + "</b>";
+        holder.tvMessage.setText(HtmlCompat.fromHtml(message, Html.FROM_HTML_MODE_LEGACY));
 
         try {
             Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(userNotification.getCreateDate());
-            createDate = new SimpleDateFormat(" HH:mm:ss dd/MM/yyyy").format(date);
+            createDate = new SimpleDateFormat("MMM dd yyyy' at 'hh:mm a").format(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }
         holder.tvCreateDate.setText(createDate);
 
-        if (userNotification.getIsHandled()) {
-            holder.imgIsHandled.setVisibility(View.VISIBLE);
-        } else {
-            holder.imgIsHandled.setVisibility(View.GONE);
-        }
-        if (position == getCount() - 1) {
-            holder.lineView.setVisibility(View.GONE);
-        } else {
-            holder.lineView.setVisibility(View.VISIBLE);
-        }
         return convertView;
     }
 
     private class ViewHolder {
+        TextView tvWorkflowName;
         TextView tvMessage;
         TextView tvCreateDate;
-        ImageView imgIsHandled;
-        View lineView;
     }
 }

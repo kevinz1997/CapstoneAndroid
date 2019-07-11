@@ -41,7 +41,7 @@ import workflow.capstone.capstoneproject.adapter.ListFileNameAdapter;
 import workflow.capstone.capstoneproject.api.ActionValue;
 import workflow.capstone.capstoneproject.api.Request;
 import workflow.capstone.capstoneproject.entities.Connection;
-import workflow.capstone.capstoneproject.entities.DynamicButton;
+import workflow.capstone.capstoneproject.entities.RequestForm;
 import workflow.capstone.capstoneproject.repository.CapstoneRepository;
 import workflow.capstone.capstoneproject.repository.CapstoneRepositoryImpl;
 import workflow.capstone.capstoneproject.utils.CallBackData;
@@ -181,10 +181,10 @@ public class SendRequestFragment extends Fragment {
 
     private void buildDynamicForm(final String workFlowTemplateID) {
         capstoneRepository = new CapstoneRepositoryImpl();
-        capstoneRepository.getRequestForm(token, workFlowTemplateID, new CallBackData<DynamicButton>() {
+        capstoneRepository.getRequestForm(token, workFlowTemplateID, new CallBackData<RequestForm>() {
             @Override
-            public void onSuccess(DynamicButton dynamicButton) {
-                final List<Connection> connectionList = dynamicButton.getConnections();
+            public void onSuccess(RequestForm requestForm) {
+                final List<Connection> connectionList = requestForm.getConnections();
                 for (final Connection connection : connectionList) {
                     Button btn = new Button(getContext());
                     btn.setText(connection.getConnectionTypeName());
@@ -249,10 +249,12 @@ public class SendRequestFragment extends Fragment {
         if (listName.size() > 0) {
             tvAttachment.setVisibility(View.VISIBLE);
         }
-        listFileNameAdapter = new ListFileNameAdapter(getContext(), listName);
-        listView.setAdapter(listFileNameAdapter);
-        listView.setVisibility(View.VISIBLE);
-        DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listView);
+        if (getActivity() != null) {
+            listFileNameAdapter = new ListFileNameAdapter(getActivity(), listName);
+            listView.setAdapter(listFileNameAdapter);
+            listView.setVisibility(View.VISIBLE);
+            DynamicWorkflowUtils.setListViewHeightBasedOnChildren(listView);
+        }
     }
 
     private void sendRequest(String workFlowTemplateID, String nextStepID) {
